@@ -97,8 +97,19 @@ class Game2048Screen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    ScoreCard("SCORE", state.score, modifier = Modifier.weight(1f))
-                    ScoreCard("BEST", highScore, modifier = Modifier.weight(1f))
+                    ScoreCard(
+                        label = "SCORE",
+                        icon = painterResource(R.drawable.round_sports_score_24),
+                        score = state.score,
+                        modifier = Modifier.weight(1f),
+
+                        )
+                    ScoreCard(
+                        label = "BEST",
+                        icon = painterResource(R.drawable.round_leaderboard_24),
+                        score = highScore,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
