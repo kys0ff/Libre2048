@@ -195,6 +195,14 @@ fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
     val animatedBg by animateColorAsState(targetValue = targetBg, label = "bgColor")
     val animatedText by animateColorAsState(targetValue = targetText, label = "textColor")
 
+    // Determine font size based on digit count
+    val fontSize = when {
+        tile.value < 100 -> 32.sp
+        tile.value < 1000 -> 24.sp
+        tile.value < 10000 -> 20.sp
+        else -> 16.sp
+    }
+
     val scale = remember { Animatable(0f) }
 
     LaunchedEffect(tile.id) {
@@ -226,9 +234,11 @@ fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
     ) {
         Text(
             text = tile.value.toString(),
-            fontSize = 24.sp,
+            fontSize = fontSize,
             fontWeight = FontWeight.ExtraBold,
-            color = animatedText
+            color = animatedText,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
