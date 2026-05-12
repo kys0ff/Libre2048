@@ -118,7 +118,6 @@ class StatisticsScreen : Screen {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // A large, subtle icon makes the screen feel designed rather than broken
             Icon(
                 painter = painterResource(R.drawable.round_bar_chart_24),
                 contentDescription = null,
@@ -145,7 +144,6 @@ class StatisticsScreen : Screen {
 
     @Composable
     private fun TotalSummary(scores: List<GameScore>) {
-        // High-emphasis card for lifetime stats
         Surface(
             modifier = Modifier.padding(16.dp),
             shape = MaterialTheme.shapes.extraLarge,
@@ -218,7 +216,6 @@ class StatisticsScreen : Screen {
     @Composable
     private fun ModeHeader(mode: GameMode, scores: List<GameScore>) {
         Surface(
-            // Tonal surface that sticks to the top
             color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
