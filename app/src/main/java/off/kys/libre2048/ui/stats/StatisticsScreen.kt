@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,10 +43,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.libre2048.R
-import off.kys.libre2048.data.repository.GameRepository
 import off.kys.libre2048.domain.model.GameMode
 import off.kys.libre2048.domain.model.GameScore
-import org.koin.compose.koinInject
+import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,12 +56,10 @@ class StatisticsScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val repository = koinInject<GameRepository>()
-        val scores by repository.getAllScores().collectAsState(initial = emptyList())
+        val viewModel = koinViewModel<StatisticsViewModel>()
+        val uiState by viewModel.uiState.collectAsState()
 
         val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
-        val scoresByMode = remember(scores) { scores.groupBy { it.mode } }
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -80,34 +78,46 @@ class StatisticsScreen : Screen {
                 )
             }
         ) { innerPadding ->
-            if (scores.isEmpty()) {
-                EmptyStatsState(Modifier.padding(innerPadding))
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = innerPadding
-                ) {
-                    item {
-                        TotalSummary(scores)
-                        Spacer(Modifier.height(8.dp))
-                    }
-
-                    scoresByMode.forEach { (mode, modeScores) ->
-                        stickyHeader {
-                            ModeHeader(mode, modeScores)
+            when {
+                uiState.isLoading -> LoadingState(Modifier.padding(innerPadding))
+                uiState.scores.isEmpty() -> EmptyStatsState(Modifier.padding(innerPadding))
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = innerPadding
+                    ) {
+                        item {
+                            TotalSummary(uiState.scores)
+                            Spacer(Modifier.height(8.dp))
                         }
 
-                        items(
-                            items = modeScores.sortedByDescending { it.date },
-                            key = { it.score }
-                        ) { score ->
-                            ScoreItem(score)
-                        }
+                        uiState.scoresByMode.forEach { (mode, modeScores) ->
+                            stickyHeader {
+                                ModeHeader(mode, modeScores)
+                            }
 
-                        item { Spacer(Modifier.height(16.dp)) }
+                            items(
+                                items = modeScores.sortedByDescending { it.date },
+                                key = { it.score }
+                            ) { score ->
+                                ScoreItem(score)
+                            }
+
+                            item { Spacer(Modifier.height(16.dp)) }
+                        }
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun LoadingState(modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 

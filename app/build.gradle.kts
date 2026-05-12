@@ -57,6 +57,7 @@ dependencies {
     // AndroidX Core & Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.core.splashscreen)
 
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
