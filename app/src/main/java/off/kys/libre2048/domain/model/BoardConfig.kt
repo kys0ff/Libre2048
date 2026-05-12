@@ -5,6 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BoardConfig(
     val rows: Int,
-    val cols: Int,
-    val label: String
+    val cols: Int
 )

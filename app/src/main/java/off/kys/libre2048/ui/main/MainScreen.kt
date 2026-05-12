@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,17 +59,17 @@ class MainScreen : Screen {
 
     companion object {
         private val SQUARE_MODES = listOf(
-            BoardConfig(4, 4, "4x4"),
-            BoardConfig(5, 5, "5x5"),
-            BoardConfig(6, 6, "6x6"),
-            BoardConfig(8, 8, "8x8")
+            BoardConfig(4, 4),
+            BoardConfig(5, 5),
+            BoardConfig(6, 6),
+            BoardConfig(8, 8)
         )
 
         private val RECT_MODES = listOf(
-            BoardConfig(3, 5, "3x5"),
-            BoardConfig(4, 6, "4x6"),
-            BoardConfig(5, 8, "5x8"),
-            BoardConfig(6, 9, "6x9")
+            BoardConfig(3, 5),
+            BoardConfig(4, 6),
+            BoardConfig(5, 8),
+            BoardConfig(6, 9)
         )
     }
 
@@ -100,7 +101,7 @@ class MainScreen : Screen {
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.round_bar_chart_24),
-                        contentDescription = "Statistics"
+                        contentDescription = stringResource(R.string.common_stats)
                     )
                 }
             }
@@ -125,7 +126,7 @@ class MainScreen : Screen {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Square Modes",
+                    text = stringResource(R.string.main_square_modes),
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
@@ -136,7 +137,7 @@ class MainScreen : Screen {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Rectangular Modes",
+                    text = stringResource(R.string.main_rectangular_modes),
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
@@ -199,7 +200,10 @@ class MainScreen : Screen {
                     modifier = Modifier.size(100.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(config.label, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.stats_grid_format, config.rows, config.cols),
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (savedState != null) {
@@ -214,7 +218,7 @@ class MainScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text("Resume", fontSize = 12.sp)
+                        Text(stringResource(R.string.main_resume), fontSize = 12.sp)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     TextButton(
@@ -222,7 +226,7 @@ class MainScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text("New Game", fontSize = 12.sp)
+                        Text(stringResource(R.string.main_new_game), fontSize = 12.sp)
                     }
                 } else {
                     Button(
@@ -230,7 +234,7 @@ class MainScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text("Play", fontSize = 12.sp)
+                        Text(stringResource(R.string.main_play), fontSize = 12.sp)
                     }
                 }
             }
@@ -252,7 +256,7 @@ class MainScreen : Screen {
             },
             title = {
                 Text(
-                    text = "Select Difficulty",
+                    text = stringResource(R.string.main_select_difficulty),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
@@ -275,7 +279,7 @@ class MainScreen : Screen {
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("Close")
+                    Text(stringResource(R.string.common_close))
                 }
             }
         )
@@ -287,9 +291,15 @@ class MainScreen : Screen {
         onClick: () -> Unit
     ) {
         val undoText = when (mode.undoPolicy) {
-            UndoPolicy.UNLIMITED -> "Unlimited Undos"
-            UndoPolicy.SINGLE -> "Single Undo"
-            UndoPolicy.NONE -> "No Undos"
+            UndoPolicy.UNLIMITED -> stringResource(R.string.undo_unlimited)
+            UndoPolicy.SINGLE -> stringResource(R.string.undo_single)
+            UndoPolicy.NONE -> stringResource(R.string.undo_none)
+        }
+
+        val modeLabel = when (mode) {
+            GameMode.CASUAL -> stringResource(R.string.mode_casual)
+            GameMode.CLASSIC -> stringResource(R.string.mode_classic)
+            GameMode.HARDCORE -> stringResource(R.string.mode_hardcore)
         }
 
         val containerColor = if (mode.undoPolicy == UndoPolicy.NONE) {
@@ -334,7 +344,7 @@ class MainScreen : Screen {
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = mode.label,
+                        text = modeLabel,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )

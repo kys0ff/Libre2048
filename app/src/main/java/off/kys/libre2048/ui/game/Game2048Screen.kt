@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -64,12 +65,18 @@ class Game2048Screen(
             else viewModel.onEvent(GameEvent.StartNewGame(rows, cols, mode))
         }
 
+        val modeLabel = when (state.mode) {
+            GameMode.CASUAL -> stringResource(R.string.mode_casual)
+            GameMode.CLASSIC -> stringResource(R.string.mode_classic)
+            GameMode.HARDCORE -> stringResource(R.string.mode_hardcore)
+        }
+
         Scaffold(
             topBar = {
                 GameTopBar(
                     rows = state.rows,
                     cols = state.cols,
-                    modeLabel = state.mode.label,
+                    modeLabel = modeLabel,
                     onBack = { navigator.pop() },
                     onRestart = {
                         viewModel.onEvent(
@@ -149,7 +156,12 @@ class Game2048Screen(
                 Column {
                     Text("2048")
                     Text(
-                        "$rows × $cols Edition - $modeLabel",
+                        stringResource(
+                            R.string.game_mode_title_format,
+                            rows,
+                            cols,
+                            modeLabel
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -157,12 +169,18 @@ class Game2048Screen(
             },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(painterResource(R.drawable.round_arrow_back_24), "Back")
+                    Icon(
+                        painterResource(R.drawable.round_arrow_back_24),
+                        stringResource(R.string.common_back)
+                    )
                 }
             },
             actions = {
                 IconButton(onClick = onRestart) {
-                    Icon(painterResource(R.drawable.round_refresh_24), "Restart")
+                    Icon(
+                        painterResource(R.drawable.round_refresh_24),
+                        stringResource(R.string.common_restart)
+                    )
                 }
             }
         )
@@ -178,13 +196,13 @@ class Game2048Screen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             ScoreCard(
-                label = "Score",
+                label = stringResource(R.string.game_score),
                 score = currentScore,
                 icon = painterResource(R.drawable.round_star_24),
                 modifier = Modifier.weight(1f)
             )
             ScoreCard(
-                label = "Best",
+                label = stringResource(R.string.stats_best),
                 score = highScore,
                 icon = painterResource(R.drawable.round_emoji_events_24),
                 modifier = Modifier.weight(1f)
@@ -216,12 +234,12 @@ class Game2048Screen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        "Game Over",
+                        stringResource(R.string.game_over),
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        "Final Score: $score",
+                        stringResource(R.string.game_final_score_format, score),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
@@ -231,7 +249,7 @@ class Game2048Screen(
                     ) {
                         Icon(painterResource(R.drawable.round_refresh_24), null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Try Again")
+                        Text(stringResource(R.string.game_try_again))
                     }
                 }
             }
@@ -258,7 +276,7 @@ class Game2048Screen(
             ) {
                 Icon(painterResource(R.drawable.round_undo_24), null)
                 Spacer(Modifier.width(8.dp))
-                Text("Undo")
+                Text(stringResource(R.string.common_undo))
             }
 
             FilledTonalButton(
@@ -270,7 +288,7 @@ class Game2048Screen(
             ) {
                 Icon(painterResource(R.drawable.round_leaderboard_24), null)
                 Spacer(Modifier.width(8.dp))
-                Text("Statistics")
+                Text(stringResource(R.string.common_stats))
             }
         }
     }

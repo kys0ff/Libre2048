@@ -1,3 +1,46 @@
 <resources>
     <string name="app_name">Libre2048</string>
+
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_stats">Statistics</string>
+    <string name="common_close">Close</string>
+    <string name="common_restart">Restart</string>
+    <string name="common_undo">Undo</string>
+
+    <!-- Main Screen -->
+    <string name="main_square_modes">Square Modes</string>
+    <string name="main_rectangular_modes">Rectangular Modes</string>
+    <string name="main_resume">Resume</string>
+    <string name="main_new_game">New Game</string>
+    <string name="main_play">Play</string>
+    <string name="main_select_difficulty">Select Difficulty</string>
+
+    <!-- Undo Policies -->
+    <string name="undo_unlimited">Unlimited Undos</string>
+    <string name="undo_single">Single Undo</string>
+    <string name="undo_none">No Undos</string>
+
+    <!-- Statistics Screen -->
+    <string name="stats_title">Statistics</string>
+    <string name="stats_empty_title">No games recorded yet</string>
+    <string name="stats_empty_subtitle">Play a game to see your progress here!</string>
+    <string name="stats_lifetime_overview">Lifetime Overview</string>
+    <string name="stats_games">Games</string>
+    <string name="stats_best">Best</string>
+    <string name="stats_avg">Avg</string>
+    <string name="stats_count_games">%1$d Games</string>
+    <string name="stats_grid_format">%1$dx%2$d Grid</string>
+
+    <!-- Game Screen -->
+    <string name="game_mode_title_format">%1$d × %2$d Edition - %3$s</string>
+    <string name="game_score">Score</string>
+    <string name="game_over">Game Over</string>
+    <string name="game_final_score_format">Final Score: %1$d</string>
+    <string name="game_try_again">Try Again</string>
+
+    <!-- Game Modes -->
+    <string name="mode_casual">Casual</string>
+    <string name="mode_classic">Classic</string>
+    <string name="mode_hardcore">Hardcore</string>
 </resources>

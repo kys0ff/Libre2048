@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,12 +66,17 @@ class StatisticsScreen : Screen {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 LargeTopAppBar(
-                    title = { Text("Statistics", fontWeight = FontWeight.Bold) },
+                    title = {
+                        Text(
+                            text = stringResource(R.string.stats_title),
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(
                                 painter = painterResource(R.drawable.round_arrow_back_24),
-                                contentDescription = "Back"
+                                contentDescription = stringResource(R.string.common_back)
                             )
                         }
                     },
@@ -138,14 +144,14 @@ class StatisticsScreen : Screen {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "No games recorded yet",
+                text = stringResource(R.string.stats_empty_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Medium
             )
 
             Text(
-                text = "Play a game to see your progress here!",
+                text = stringResource(R.string.stats_empty_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
             )
@@ -169,7 +175,7 @@ class StatisticsScreen : Screen {
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = "Lifetime Overview",
+                        text = stringResource(R.string.stats_lifetime_overview),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -182,17 +188,17 @@ class StatisticsScreen : Screen {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     SummaryStat(
-                        label = "Games",
+                        label = stringResource(R.string.stats_games),
                         value = scores.size.toString(),
                         icon = painterResource(R.drawable.round_history_24)
                     )
                     SummaryStat(
-                        label = "Best",
+                        label = stringResource(R.string.stats_best),
                         value = scores.maxOf { it.score }.toString(),
                         icon = painterResource(R.drawable.round_emoji_events_24)
                     )
                     SummaryStat(
-                        label = "Avg",
+                        label = stringResource(R.string.stats_avg),
                         value = (scores.map { it.score }.average().toInt()).toString(),
                         icon = painterResource(R.drawable.round_functions_24)
                     )
@@ -225,6 +231,12 @@ class StatisticsScreen : Screen {
 
     @Composable
     private fun ModeHeader(mode: GameMode, scores: List<GameScore>) {
+        val modeLabel = when (mode) {
+            GameMode.CASUAL -> stringResource(R.string.mode_casual)
+            GameMode.CLASSIC -> stringResource(R.string.mode_classic)
+            GameMode.HARDCORE -> stringResource(R.string.mode_hardcore)
+        }
+
         Surface(
             color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
             modifier = Modifier.fillMaxWidth()
@@ -235,7 +247,7 @@ class StatisticsScreen : Screen {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = mode.label,
+                    text = modeLabel,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary
@@ -245,7 +257,7 @@ class StatisticsScreen : Screen {
                     shape = CircleShape
                 ) {
                     Text(
-                        text = "${scores.size} Games",
+                        text = stringResource(R.string.stats_count_games, scores.size),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -288,7 +300,7 @@ class StatisticsScreen : Screen {
                     .weight(1f)
             ) {
                 Text(
-                    text = "${score.rows}x${score.cols} Grid",
+                    text = stringResource(R.string.stats_grid_format, score.rows, score.cols),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
