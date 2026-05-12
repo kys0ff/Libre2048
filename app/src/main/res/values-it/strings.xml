@@ -1,0 +1,44 @@
+<resources>
+    <!-- Common -->
+    <string name="common_back">Indietro</string>
+    <string name="common_stats">Statistiche</string>
+    <string name="common_close">Chiudi</string>
+    <string name="common_restart">Riavvia</string>
+    <string name="common_undo">Annulla</string>
+
+    <!-- Main Screen -->
+    <string name="main_square_modes">Modalità Quadrata</string>
+    <string name="main_rectangular_modes">Modalità Rettangolare</string>
+    <string name="main_resume">Riprendi</string>
+    <string name="main_new_game">Nuova Partita</string>
+    <string name="main_play">Gioca</string>
+    <string name="main_select_difficulty">Seleziona Difficoltà</string>
+
+    <!-- Undo Policies -->
+    <string name="undo_unlimited">Annullamenti Illimitati</string>
+    <string name="undo_single">Singolo Annullamento</string>
+    <string name="undo_none">Nessun Annullamento</string>
+
+    <!-- Statistics Screen -->
+    <string name="stats_title">Statistiche</string>
+    <string name="stats_empty_title">Nessuna partita registrata</string>
+    <string name="stats_empty_subtitle">Gioca una partita per vedere i tuoi progressi qui!</string>
+    <string name="stats_lifetime_overview">Panoramica Generale</string>
+    <string name="stats_games">Partite</string>
+    <string name="stats_best">Migliore</string>
+    <string name="stats_avg">Media</string>
+    <string name="stats_count_games">%1$d Partite</string>
+    <string name="stats_grid_format">Griglia %1$dx%2$d</string>
+
+    <!-- Game Screen -->
+    <string name="game_mode_title_format">Edizione %1$d × %2$d - %3$s</string>
+    <string name="game_score">Punteggio</string>
+    <string name="game_over">Game Over</string>
+    <string name="game_final_score_format">Punteggio Finale: %1$d</string>
+    <string name="game_try_again">Riprova</string>
+
+    <!-- Game Modes -->
+    <string name="mode_casual">Casual</string>
+    <string name="mode_classic">Classico</string>
+    <string name="mode_hardcore">Hardcore</string>
+</resources>

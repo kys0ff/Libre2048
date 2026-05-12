@@ -1,0 +1,44 @@
+<resources>
+    <!-- Common -->
+    <string name="common_back">Zurück</string>
+    <string name="common_stats">Statistiken</string>
+    <string name="common_close">Schließen</string>
+    <string name="common_restart">Neustart</string>
+    <string name="common_undo">Rückgängig</string>
+
+    <!-- Main Screen -->
+    <string name="main_square_modes">Quadratische Modi</string>
+    <string name="main_rectangular_modes">Rechteckige Modi</string>
+    <string name="main_resume">Fortsetzen</string>
+    <string name="main_new_game">Neues Spiel</string>
+    <string name="main_play">Spielen</string>
+    <string name="main_select_difficulty">Schwierigkeit wählen</string>
+
+    <!-- Undo Policies -->
+    <string name="undo_unlimited">Unbegrenztes Rückgängigmachen</string>
+    <string name="undo_single">Einmaliges Rückgängigmachen</string>
+    <string name="undo_none">Kein Rückgängigmachen</string>
+
+    <!-- Statistics Screen -->
+    <string name="stats_title">Statistiken</string>
+    <string name="stats_empty_title">Noch keine Spiele aufgezeichnet</string>
+    <string name="stats_empty_subtitle">Spiele ein Spiel, um deinen Fortschritt hier zu sehen!</string>
+    <string name="stats_lifetime_overview">Lebenslange Übersicht</string>
+    <string name="stats_games">Spiele</string>
+    <string name="stats_best">Bestleistung</string>
+    <string name="stats_avg">Durchschn.</string>
+    <string name="stats_count_games">%1$d Spiele</string>
+    <string name="stats_grid_format">%1$dx%2$d Gitter</string>
+
+    <!-- Game Screen -->
+    <string name="game_mode_title_format">%1$d × %2$d Edition - %3$s</string>
+    <string name="game_score">Punktzahl</string>
+    <string name="game_over">Spiel vorbei</string>
+    <string name="game_final_score_format">Endpunktzahl: %1$d</string>
+    <string name="game_try_again">Erneut versuchen</string>
+
+    <!-- Game Modes -->
+    <string name="mode_casual">Entspannt</string>
+    <string name="mode_classic">Klassisch</string>
+    <string name="mode_hardcore">Hardcore</string>
+</resources>

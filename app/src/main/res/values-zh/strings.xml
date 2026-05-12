@@ -1,0 +1,44 @@
+<resources>
+    <!-- Common -->
+    <string name="common_back">返回</string>
+    <string name="common_stats">统计</string>
+    <string name="common_close">关闭</string>
+    <string name="common_restart">重新开始</string>
+    <string name="common_undo">撤销</string>
+
+    <!-- Main Screen -->
+    <string name="main_square_modes">正方形模式</string>
+    <string name="main_rectangular_modes">矩形模式</string>
+    <string name="main_resume">继续</string>
+    <string name="main_new_game">新游戏</string>
+    <string name="main_play">开始</string>
+    <string name="main_select_difficulty">选择难度</string>
+
+    <!-- Undo Policies -->
+    <string name="undo_unlimited">无限撤销</string>
+    <string name="undo_single">单次撤销</string>
+    <string name="undo_none">不可撤销</string>
+
+    <!-- Statistics Screen -->
+    <string name="stats_title">统计</string>
+    <string name="stats_empty_title">暂无游戏记录</string>
+    <string name="stats_empty_subtitle">玩一局游戏来查看您的进度！</string>
+    <string name="stats_lifetime_overview">终身概览</string>
+    <string name="stats_games">游戏次数</string>
+    <string name="stats_best">最高分</string>
+    <string name="stats_avg">平均分</string>
+    <string name="stats_count_games">%1$d 场游戏</string>
+    <string name="stats_grid_format">%1$dx%2$d 网格</string>
+
+    <!-- Game Screen -->
+    <string name="game_mode_title_format">%1$d × %2$d 版本 - %3$s</string>
+    <string name="game_score">分数</string>
+    <string name="game_over">游戏结束</string>
+    <string name="game_final_score_format">最终分数：%1$d</string>
+    <string name="game_try_again">再试一次</string>
+
+    <!-- Game Modes -->
+    <string name="mode_casual">休闲</string>
+    <string name="mode_classic">经典</string>
+    <string name="mode_hardcore">核心</string>
+</resources>

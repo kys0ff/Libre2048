@@ -1,0 +1,44 @@
+<resources>
+    <!-- Common -->
+    <string name="common_back">Voltar</string>
+    <string name="common_stats">Estatísticas</string>
+    <string name="common_close">Fechar</string>
+    <string name="common_restart">Reiniciar</string>
+    <string name="common_undo">Desfazer</string>
+
+    <!-- Main Screen -->
+    <string name="main_square_modes">Modos Quadrados</string>
+    <string name="main_rectangular_modes">Modos Retangulares</string>
+    <string name="main_resume">Retomar</string>
+    <string name="main_new_game">Novo Jogo</string>
+    <string name="main_play">Jogar</string>
+    <string name="main_select_difficulty">Selecionar Dificuldade</string>
+
+    <!-- Undo Policies -->
+    <string name="undo_unlimited">Desfazer Ilimitado</string>
+    <string name="undo_single">Desfazer Único</string>
+    <string name="undo_none">Sem Desfazer</string>
+
+    <!-- Statistics Screen -->
+    <string name="stats_title">Estatísticas</string>
+    <string name="stats_empty_title">Nenhum jogo gravado</string>
+    <string name="stats_empty_subtitle">Jogue uma partida para ver o seu progresso aqui!</string>
+    <string name="stats_lifetime_overview">Visão Geral</string>
+    <string name="stats_games">Jogos</string>
+    <string name="stats_best">Melhor</string>
+    <string name="stats_avg">Méd.</string>
+    <string name="stats_count_games">%1$d Jogos</string>
+    <string name="stats_grid_format">Grelha %1$dx%2$d</string>
+
+    <!-- Game Screen -->
+    <string name="game_mode_title_format">Edição %1$d × %2$d - %3$s</string>
+    <string name="game_score">Pontuação</string>
+    <string name="game_over">Fim de Jogo</string>
+    <string name="game_final_score_format">Pontuação Final: %1$d</string>
+    <string name="game_try_again">Tentar Novamente</string>
+
+    <!-- Game Modes -->
+    <string name="mode_casual">Casual</string>
+    <string name="mode_classic">Clássico</string>
+    <string name="mode_hardcore">Hardcore</string>
+</resources>

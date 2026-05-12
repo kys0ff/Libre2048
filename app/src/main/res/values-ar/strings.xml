@@ -1,0 +1,44 @@
+<resources>
+    <!-- Common -->
+    <string name="common_back">عودة</string>
+    <string name="common_stats">الإحصائيات</string>
+    <string name="common_close">إغلاق</string>
+    <string name="common_restart">إعادة التشغيل</string>
+    <string name="common_undo">تراجع</string>
+
+    <!-- Main Screen -->
+    <string name="main_square_modes">الأوضاع المربعة</string>
+    <string name="main_rectangular_modes">الأوضاع المستطيلة</string>
+    <string name="main_resume">استئناف</string>
+    <string name="main_new_game">لعبة جديدة</string>
+    <string name="main_play">لعب</string>
+    <string name="main_select_difficulty">اختر الصعوبة</string>
+
+    <!-- Undo Policies -->
+    <string name="undo_unlimited">تراجعات غير محدودة</string>
+    <string name="undo_single">تراجع واحد</string>
+    <string name="undo_none">بدون تراجع</string>
+
+    <!-- Statistics Screen -->
+    <string name="stats_title">الإحصائيات</string>
+    <string name="stats_empty_title">لا توجد ألعاب مسجلة بعد</string>
+    <string name="stats_empty_subtitle">العب لترى تقدمك هنا!</string>
+    <string name="stats_lifetime_overview">نظرة عامة شاملة</string>
+    <string name="stats_games">الألعاب</string>
+    <string name="stats_best">الأفضل</string>
+    <string name="stats_avg">المتوسط</string>
+    <string name="stats_count_games">%1$d ألعاب</string>
+    <string name="stats_grid_format">شبكة %1$dx%2$d</string>
+
+    <!-- Game Screen -->
+    <string name="game_mode_title_format">إصدار %1$d × %2$d - %3$s</string>
+    <string name="game_score">النتيجة</string>
+    <string name="game_over">انتهت اللعبة</string>
+    <string name="game_final_score_format">النتيجة النهائية: %1$d</string>
+    <string name="game_try_again">حاول مرة أخرى</string>
+
+    <!-- Game Modes -->
+    <string name="mode_casual">كاجوال</string>
+    <string name="mode_classic">كلاسيكي</string>
+    <string name="mode_hardcore">هاردكور</string>
+</resources>

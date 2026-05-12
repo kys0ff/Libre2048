@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Libre2048</string>
+    <string name="app_name" translatable="false">Libre2048</string>
 
     <!-- Common -->
     <string name="common_back">Back</string>
