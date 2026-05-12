@@ -8,8 +8,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import off.kys.libre2048.data.repository.GameRepository
 import off.kys.libre2048.domain.model.Direction
+import off.kys.libre2048.domain.model.GameMode
+import off.kys.libre2048.domain.model.GameScore
 import off.kys.libre2048.domain.model.GameState
 import off.kys.libre2048.domain.model.Tile
+import off.kys.libre2048.domain.model.UndoPolicy
 import java.util.Stack
 import kotlin.random.Random
 
@@ -28,7 +31,18 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
             _state.collectLatest { state ->
                 if (state.grid.isNotEmpty()) {
                     repository.saveCurrentState(state.rows, state.cols, state)
-                    repository.saveHighScore(state.rows, state.cols, state.score)
+                    repository.saveHighScore(state.rows, state.cols, state.mode, state.score)
+                    if (state.isGameOver) {
+                        repository.saveScore(
+                            GameScore(
+                                score = state.score,
+                                date = System.currentTimeMillis(),
+                                rows = state.rows,
+                                cols = state.cols,
+                                mode = state.mode
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -36,7 +50,7 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
         viewModelScope.launch {
             _state.collectLatest { state ->
                 if (state.grid.isNotEmpty()) {
-                    repository.getHighScore(state.rows, state.cols).collect {
+                    repository.getHighScore(state.rows, state.cols, state.mode).collect {
                         _highScore.value = it
                     }
                 }
@@ -47,20 +61,21 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     fun onEvent(event: GameEvent) {
         when (event) {
-            is GameEvent.StartNewGame -> startNewGame(event.rows, event.cols)
+            is GameEvent.StartNewGame -> startNewGame(event.rows, event.cols, event.mode)
             is GameEvent.Move -> move(event.direction)
             GameEvent.Undo -> undo()
             is GameEvent.ResumeGame -> resumeGame(event.rows, event.cols)
         }
     }
 
-    private fun startNewGame(rows: Int, cols: Int) {
+    private fun startNewGame(rows: Int, cols: Int, mode: GameMode) {
         history.clear()
         tileIdCounter = 0
         val initialState = GameState(
             grid = List(rows) { List(cols) { null } },
             rows = rows,
-            cols = cols
+            cols = cols,
+            mode = mode
         ).spawnTile().spawnTile()
         _state.value = initialState
     }
@@ -71,17 +86,24 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
                 if (savedState != null) {
                     _state.value = savedState
                     tileIdCounter = (savedState.grid.flatten().filterNotNull().maxOfOrNull { it.id } ?: -1) + 1
+                    history.clear() // Resume doesn't keep history for now
                 } else {
-                    startNewGame(rows, cols)
+                    startNewGame(rows, cols, GameMode.CLASSIC)
                 }
             }
         }
     }
 
     private fun undo() {
-        if (history.isNotEmpty()) {
+        if (_state.value.mode.undoPolicy == UndoPolicy.NONE) return
+
+        val canUndo = history.isNotEmpty()
+
+        if (canUndo) {
             _state.value = history.pop()
         }
+        _state.value =
+            _state.value.copy(canUndo = history.isNotEmpty() && _state.value.mode.undoPolicy != UndoPolicy.NONE)
     }
 
     private fun move(direction: Direction) {
@@ -89,10 +111,17 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
         val (newGrid, moveScore) = calculateMove(currentState.grid, direction, currentState.rows, currentState.cols)
 
         if (isGridChanged(currentState.grid, newGrid, currentState.rows, currentState.cols)) {
-            history.push(currentState)
+            if (currentState.mode.undoPolicy != UndoPolicy.NONE) {
+                if (currentState.mode.undoPolicy == UndoPolicy.SINGLE) {
+                    history.clear()
+                }
+                history.push(currentState)
+            }
+            
             val nextState = currentState.copy(
                 grid = newGrid,
-                score = currentState.score + moveScore
+                score = currentState.score + moveScore,
+                canUndo = currentState.mode.undoPolicy != UndoPolicy.NONE
             ).spawnTile()
 
             _state.value = nextState.copy(isGameOver = checkGameOver(nextState.grid, nextState.rows, nextState.cols))

@@ -1,10 +1,8 @@
 package off.kys.libre2048.ui.game
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,10 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,71 +27,59 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.libre2048.R
+import off.kys.libre2048.domain.model.GameMode
 import off.kys.libre2048.ui.common.GameBoard
 import off.kys.libre2048.ui.common.ScoreCard
+import off.kys.libre2048.ui.stats.StatisticsScreen
 import org.koin.androidx.compose.koinViewModel
 
 class Game2048Screen(
-    val rows: Int = 4,
-    val cols: Int = 4,
-    val resume: Boolean = false
+    private val rows: Int = 4,
+    private val cols: Int = 4,
+    private val resume: Boolean = false,
+    private val mode: GameMode = GameMode.CLASSIC
 ) : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinViewModel<GameViewModel>()
         val state by viewModel.state.collectAsState()
         val highScore by viewModel.highScore.collectAsState()
-        val navigator = LocalNavigator.currentOrThrow
-
-        // Use a scroll behavior to make the TopAppBar collapse elegantly
-        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
         LaunchedEffect(Unit) {
             if (resume) viewModel.onEvent(GameEvent.ResumeGame(rows, cols))
-            else viewModel.onEvent(GameEvent.StartNewGame(rows, cols))
+            else viewModel.onEvent(GameEvent.StartNewGame(rows, cols, mode))
         }
 
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                LargeTopAppBar(
-                    title = {
-                        Column {
-                            Text("2048")
-                            Text(
-                                "${state.rows} × ${state.cols} Edition",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                GameTopBar(
+                    rows = state.rows,
+                    cols = state.cols,
+                    modeLabel = state.mode.label,
+                    onBack = { navigator.pop() },
+                    onRestart = {
+                        viewModel.onEvent(
+                            GameEvent.StartNewGame(
+                                state.rows,
+                                state.cols,
+                                state.mode
                             )
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(painterResource(R.drawable.round_arrow_back_24), "Back")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { viewModel.onEvent(GameEvent.StartNewGame(state.rows, state.cols)) }) {
-                            Icon(painterResource(R.drawable.round_refresh_24), "Restart")
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
+                        )
+                    }
                 )
             }
         ) { padding ->
@@ -103,104 +87,190 @@ class Game2048Screen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ScoreCard(
-                        label = "Score",
-                        score = state.score,
-                        icon = painterResource(R.drawable.round_star_24),
-                        modifier = Modifier.weight(1f)
-                    )
-                    ScoreCard(
-                        label = "Best",
-                        score = highScore,
-                        icon = painterResource(R.drawable.round_emoji_events_24),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                GameScoreHeader(
+                    currentScore = state.score,
+                    highScore = highScore
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .aspectRatio(state.cols.toFloat() / state.rows.toFloat())
                 ) {
                     GameBoard(
                         grid = state.grid,
                         rows = state.rows,
                         cols = state.cols,
-                        onMove = { viewModel.onEvent(GameEvent.Move(it)) }
+                        onMove = { if (!state.isGameOver) viewModel.onEvent(GameEvent.Move(it)) }
+                    )
+
+                    GameOverOverlay(
+                        isGameOver = state.isGameOver,
+                        score = state.score,
+                        onRestart = {
+                            viewModel.onEvent(
+                                GameEvent.StartNewGame(
+                                    state.rows,
+                                    state.cols,
+                                    state.mode
+                                )
+                            )
+                        }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Action Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                GameControls(
+                    canUndo = state.canUndo,
+                    onUndo = { viewModel.onEvent(GameEvent.Undo) },
+                    onStatistics = { navigator += StatisticsScreen() }
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun GameTopBar(
+        rows: Int,
+        cols: Int,
+        modeLabel: String,
+        onBack: () -> Unit,
+        onRestart: () -> Unit
+    ) {
+        LargeTopAppBar(
+            title = {
+                Column {
+                    Text("2048")
+                    Text(
+                        "$rows × $cols Edition - $modeLabel",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(painterResource(R.drawable.round_arrow_back_24), "Back")
+                }
+            },
+            actions = {
+                IconButton(onClick = onRestart) {
+                    Icon(painterResource(R.drawable.round_refresh_24), "Restart")
+                }
+            }
+        )
+    }
+
+    @Composable
+    private fun GameScoreHeader(
+        currentScore: Int,
+        highScore: Int
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ScoreCard(
+                label = "Score",
+                score = currentScore,
+                icon = painterResource(R.drawable.round_star_24),
+                modifier = Modifier.weight(1f)
+            )
+            ScoreCard(
+                label = "Best",
+                score = highScore,
+                icon = painterResource(R.drawable.round_emoji_events_24),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+
+    @Composable
+    private fun GameOverOverlay(
+        isGameOver: Boolean,
+        score: Int,
+        onRestart: () -> Unit
+    ) {
+        AnimatedVisibility(
+            visible = isGameOver,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    OutlinedButton(
-                        onClick = { viewModel.onEvent(GameEvent.Undo) },
-                        modifier = Modifier.weight(1f).height(56.dp),
-                        enabled = !state.isGameOver,
+                    Text(
+                        "Game Over",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "Final Score: $score",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+                    Button(
+                        onClick = onRestart,
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Icon(painterResource(R.drawable.round_undo_24), null)
+                        Icon(painterResource(R.drawable.round_refresh_24), null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Undo")
-                    }
-
-                    // Placeholder for other actions or a "Menu" button
-                    FilledTonalButton(
-                        onClick = { /* Settings or similar */ },
-                        modifier = Modifier.weight(1f).height(56.dp),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text("Options")
+                        Text("Try Again")
                     }
                 }
+            }
+        }
+    }
 
-                // Game Over State as a sophisticated Modal or Card
-                AnimatedVisibility(
-                    visible = state.isGameOver,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    Card(
-                        modifier = Modifier.padding(top = 24.dp).fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp).fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                "Game Over",
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Button(
-                                onClick = { viewModel.onEvent(GameEvent.StartNewGame(state.rows, state.cols)) },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.error
-                                )
-                            ) {
-                                Text("Try Again")
-                            }
-                        }
-                    }
-                }
+    @Composable
+    private fun GameControls(
+        canUndo: Boolean,
+        onUndo: () -> Unit,
+        onStatistics: () -> Unit
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedButton(
+                onClick = onUndo,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp),
+                enabled = canUndo,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Icon(painterResource(R.drawable.round_undo_24), null)
+                Spacer(Modifier.width(8.dp))
+                Text("Undo")
+            }
+
+            FilledTonalButton(
+                onClick = onStatistics,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Icon(painterResource(R.drawable.round_leaderboard_24), null)
+                Spacer(Modifier.width(8.dp))
+                Text("Statistics")
             }
         }
     }
