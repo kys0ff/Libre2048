@@ -116,12 +116,15 @@ fun GameBoard(
     var hasMovedThisGesture by remember { mutableStateOf(false) }
     val threshold = with(LocalDensity.current) { 50.dp.toPx() }
 
+    val gap = 4.dp
+    val outerPadding = 8.dp
+
     BoxWithConstraints(
         modifier = modifier
             .aspectRatio(cols.toFloat() / rows.toFloat())
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-            .padding(8.dp)
+            .padding(outerPadding)
             .pointerInput(rows, cols) {
                 detectDragGestures(
                     onDragStart = { totalDragX = 0f; totalDragY = 0f; hasMovedThisGesture = false },
@@ -146,31 +149,39 @@ fun GameBoard(
                 )
             }
     ) {
-        val gap = 4.dp
-        val tileSize = (maxWidth - (gap * (cols - 1))) / cols
+        val tileW = (maxWidth - (gap * (cols - 1))) / cols
+        val tileH = (maxHeight - (gap * (rows - 1))) / rows
+        val tileSize = minOf(tileW, tileH)
 
-        // Draw the empty background grid
-        Column(verticalArrangement = Arrangement.spacedBy(gap)) {
-            repeat(rows) {
-                Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
-                    repeat(cols) {
-                        Box(
-                            modifier = Modifier
-                                .size(tileSize)
-                                .background(
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-                                    RoundedCornerShape(4.dp)
-                                )
-                        )
+        val boardWidth = (tileSize * cols) + (gap * (cols - 1))
+        val boardHeight = (tileSize * rows) + (gap * (rows - 1))
+
+        Box(
+            modifier = Modifier
+                .size(width = boardWidth, height = boardHeight)
+                .align(Alignment.Center)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+                repeat(rows) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                        repeat(cols) {
+                            Box(
+                                modifier = Modifier
+                                    .size(tileSize)
+                                    .background(
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                                        RoundedCornerShape(4.dp)
+                                    )
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        // Draw the actual moving tiles
-        grid.flatten().filterNotNull().forEach { tile ->
-            key(tile.id) {
-                AnimatedTileItem(tile = tile, tileSize = tileSize, gap = gap)
+            grid.flatten().filterNotNull().forEach { tile ->
+                key(tile.id) {
+                    AnimatedTileItem(tile = tile, tileSize = tileSize, gap = gap)
+                }
             }
         }
     }
@@ -195,9 +206,8 @@ fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
     val animatedBg by animateColorAsState(targetValue = targetBg, label = "bgColor")
     val animatedText by animateColorAsState(targetValue = targetText, label = "textColor")
 
-    // Determine font size based on digit count
     val fontSize = when {
-        tile.value < 100 -> 32.sp
+        tile.value < 100 -> 30.sp
         tile.value < 1000 -> 24.sp
         tile.value < 10000 -> 20.sp
         else -> 16.sp

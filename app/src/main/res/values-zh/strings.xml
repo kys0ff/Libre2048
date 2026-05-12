@@ -5,6 +5,7 @@
     <string name="common_close">关闭</string>
     <string name="common_restart">重新开始</string>
     <string name="common_undo">撤销</string>
+    <string name="common_cancel">取消</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">正方形模式</string>
@@ -21,24 +22,28 @@
 
     <!-- Statistics Screen -->
     <string name="stats_title">统计</string>
-    <string name="stats_empty_title">暂无游戏记录</string>
-    <string name="stats_empty_subtitle">玩一局游戏来查看您的进度！</string>
+    <string name="stats_empty_title">暂无记录</string>
+    <string name="stats_empty_subtitle">开始游戏以查看您的进度！</string>
     <string name="stats_lifetime_overview">终身概览</string>
     <string name="stats_games">游戏次数</string>
     <string name="stats_best">最高分</string>
     <string name="stats_avg">平均分</string>
     <string name="stats_count_games">%1$d 场游戏</string>
     <string name="stats_grid_format">%1$dx%2$d 网格</string>
+    <string name="stats_date_format">MM月dd日 HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">%1$d × %2$d 版本 - %3$s</string>
-    <string name="game_score">分数</string>
+    <string name="game_score">得分</string>
     <string name="game_over">游戏结束</string>
-    <string name="game_final_score_format">最终分数：%1$d</string>
+    <string name="game_final_score_format">最终得分: %1$d</string>
     <string name="game_try_again">再试一次</string>
+    <string name="game_restart_dialog_title">重新开始游戏</string>
+    <string name="game_restart_dialog_message">您确定要开始新游戏吗？您当前的进度将会丢失。</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">休闲</string>
     <string name="mode_classic">经典</string>
-    <string name="mode_hardcore">核心</string>
+    <string name="mode_hardcore">硬核</string>
 </resources>

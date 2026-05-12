@@ -5,6 +5,7 @@
     <string name="common_close">Cerrar</string>
     <string name="common_restart">Reiniciar</string>
     <string name="common_undo">Deshacer</string>
+    <string name="common_cancel">Cancelar</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">Modos cuadrados</string>
@@ -29,6 +30,8 @@
     <string name="stats_avg">Prom.</string>
     <string name="stats_count_games">%1$d juegos</string>
     <string name="stats_grid_format">Cuadrícula %1$dx%2$d</string>
+    <string name="stats_date_format">dd MMM · HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">Edición %1$d × %2$d - %3$s</string>
@@ -36,6 +39,8 @@
     <string name="game_over">Juego terminado</string>
     <string name="game_final_score_format">Puntuación final: %1$d</string>
     <string name="game_try_again">Intentar de nuevo</string>
+    <string name="game_restart_dialog_title">Reiniciar juego</string>
+    <string name="game_restart_dialog_message">¿Estás seguro de que quieres empezar una nueva partida? Tu progreso actual se perderá.</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">Casual</string>

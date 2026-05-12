@@ -116,7 +116,7 @@ class MainScreen : Screen {
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
                 Text(
-                    text = "2048",
+                    text = stringResource(R.string.game_title),
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Black,
                     fontSize = 80.sp,

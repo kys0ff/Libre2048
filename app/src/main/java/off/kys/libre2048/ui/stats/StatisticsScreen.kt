@@ -269,7 +269,9 @@ class StatisticsScreen : Screen {
 
     @Composable
     private fun ScoreItem(score: GameScore) {
-        val dateFormat = remember { SimpleDateFormat("MMM dd · HH:mm", Locale.getDefault()) }
+        val dateFormatPattern = stringResource(R.string.stats_date_format)
+        val dateFormat =
+            remember(dateFormatPattern) { SimpleDateFormat(dateFormatPattern, Locale.getDefault()) }
 
         Row(
             modifier = Modifier
@@ -314,7 +316,7 @@ class StatisticsScreen : Screen {
             Text(
                 text = String.format(
                     locale = LocalLocale.current.platformLocale,
-                    format = "%, d",
+                    format = stringResource(R.string.stats_score_format),
                     score.score
                 ),
                 style = MaterialTheme.typography.titleLarge,

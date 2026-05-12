@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,14 +29,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -59,6 +66,7 @@ class Game2048Screen(
         val viewModel = koinViewModel<GameViewModel>()
         val state by viewModel.state.collectAsState()
         val highScore by viewModel.highScore.collectAsState()
+        val showRestartDialog = remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             if (resume) viewModel.onEvent(GameEvent.ResumeGame(rows, cols))
@@ -71,6 +79,16 @@ class Game2048Screen(
             GameMode.HARDCORE -> stringResource(R.string.mode_hardcore)
         }
 
+        fun startNewGame() {
+            viewModel.onEvent(
+                GameEvent.StartNewGame(
+                    state.rows,
+                    state.cols,
+                    state.mode
+                )
+            )
+        }
+
         Scaffold(
             topBar = {
                 GameTopBar(
@@ -79,17 +97,24 @@ class Game2048Screen(
                     modeLabel = modeLabel,
                     onBack = { navigator.pop() },
                     onRestart = {
-                        viewModel.onEvent(
-                            GameEvent.StartNewGame(
-                                state.rows,
-                                state.cols,
-                                state.mode
-                            )
-                        )
+                        if (state.isGameOver) {
+                            startNewGame()
+                            return@GameTopBar
+                        }
+                        showRestartDialog.value = true
                     }
                 )
             }
         ) { padding ->
+            if (showRestartDialog.value) {
+                RestartGameDialog(
+                    onConfirm = {
+                        startNewGame()
+                        showRestartDialog.value = false
+                    },
+                    onDismiss = { showRestartDialog.value = false }
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -154,7 +179,7 @@ class Game2048Screen(
         LargeTopAppBar(
             title = {
                 Column {
-                    Text("2048")
+                    Text(stringResource(R.string.game_title))
                     Text(
                         stringResource(
                             R.string.game_mode_title_format,
@@ -183,6 +208,60 @@ class Game2048Screen(
                     )
                 }
             }
+        )
+    }
+
+    @Composable
+    private fun RestartGameDialog(
+        onConfirm: () -> Unit,
+        onDismiss: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = onDismiss,
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.round_refresh_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.game_restart_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.game_restart_dialog_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                FilledTonalButton(
+                    onClick = onConfirm,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Text(stringResource(R.string.common_restart))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(
+                        text = stringResource(R.string.common_cancel),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            shape = MaterialTheme.shapes.extraLarge,
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
         )
     }
 

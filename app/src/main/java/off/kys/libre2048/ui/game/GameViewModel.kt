@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import off.kys.libre2048.data.repository.GameRepository
 import off.kys.libre2048.domain.model.Direction
@@ -70,6 +71,9 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     private fun startNewGame(rows: Int, cols: Int, mode: GameMode) {
         history.clear()
+        viewModelScope.launch {
+            repository.saveHistory(rows, cols, emptyList())
+        }
         tileIdCounter = 0
         val initialState = GameState(
             grid = List(rows) { List(cols) { null } },
@@ -82,14 +86,21 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     private fun resumeGame(rows: Int, cols: Int) {
         viewModelScope.launch {
-            repository.getCurrentState(rows, cols).collectLatest { savedState ->
-                if (savedState != null) {
-                    _state.value = savedState
-                    tileIdCounter = (savedState.grid.flatten().filterNotNull().maxOfOrNull { it.id } ?: -1) + 1
-                    history.clear() // Resume doesn't keep history for now
-                } else {
-                    startNewGame(rows, cols, GameMode.CLASSIC)
-                }
+            val savedState = repository.getCurrentState(rows, cols).first()
+            if (savedState != null) {
+                _state.value = savedState
+                tileIdCounter =
+                    (savedState.grid.flatten().filterNotNull().maxOfOrNull { it.id } ?: -1) + 1
+
+                val savedHistory = repository.getHistory(rows, cols).first()
+                history.clear()
+                savedHistory.forEach { history.push(it) }
+
+                _state.value = _state.value.copy(
+                    canUndo = history.isNotEmpty() && _state.value.mode.undoPolicy != UndoPolicy.NONE
+                )
+            } else {
+                startNewGame(rows, cols, GameMode.CLASSIC)
             }
         }
     }
@@ -100,7 +111,12 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
         val canUndo = history.isNotEmpty()
 
         if (canUndo) {
-            _state.value = history.pop()
+            val prevState = history.pop()
+            _state.value = prevState
+            val currentHistory = history.toList()
+            viewModelScope.launch {
+                repository.saveHistory(prevState.rows, prevState.cols, currentHistory)
+            }
         }
         _state.value =
             _state.value.copy(canUndo = history.isNotEmpty() && _state.value.mode.undoPolicy != UndoPolicy.NONE)
@@ -116,6 +132,10 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
                     history.clear()
                 }
                 history.push(currentState)
+                val currentHistory = history.toList()
+                viewModelScope.launch {
+                    repository.saveHistory(currentState.rows, currentState.cols, currentHistory)
+                }
             }
             
             val nextState = currentState.copy(

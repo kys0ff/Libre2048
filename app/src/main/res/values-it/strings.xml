@@ -5,6 +5,7 @@
     <string name="common_close">Chiudi</string>
     <string name="common_restart">Riavvia</string>
     <string name="common_undo">Annulla</string>
+    <string name="common_cancel">Annulla</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">Modalità Quadrata</string>
@@ -29,6 +30,8 @@
     <string name="stats_avg">Media</string>
     <string name="stats_count_games">%1$d Partite</string>
     <string name="stats_grid_format">Griglia %1$dx%2$d</string>
+    <string name="stats_date_format">dd MMM · HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">Edizione %1$d × %2$d - %3$s</string>
@@ -36,6 +39,8 @@
     <string name="game_over">Game Over</string>
     <string name="game_final_score_format">Punteggio Finale: %1$d</string>
     <string name="game_try_again">Riprova</string>
+    <string name="game_restart_dialog_title">Riavvia Partita</string>
+    <string name="game_restart_dialog_message">Sei sicuro di voler iniziare una nuova partita? I tuoi progressi attuali andranno persi.</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">Casual</string>

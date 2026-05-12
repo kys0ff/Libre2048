@@ -3,12 +3,13 @@
     <string name="common_back">戻る</string>
     <string name="common_stats">統計</string>
     <string name="common_close">閉じる</string>
-    <string name="common_restart">再起動</string>
+    <string name="common_restart">リスタート</string>
     <string name="common_undo">元に戻す</string>
+    <string name="common_cancel">キャンセル</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">スクエアモード</string>
-    <string name="main_rectangular_modes">レクタングルモード</string>
+    <string name="main_rectangular_modes">長方形モード</string>
     <string name="main_resume">再開</string>
     <string name="main_new_game">新規ゲーム</string>
     <string name="main_play">プレイ</string>
@@ -16,26 +17,30 @@
 
     <!-- Undo Policies -->
     <string name="undo_unlimited">元に戻す（無制限）</string>
-    <string name="undo_single">元に戻す（1回のみ）</string>
-    <string name="undo_none">元に戻す不可</string>
+    <string name="undo_single">元に戻す（1回）</string>
+    <string name="undo_none">元に戻す（なし）</string>
 
     <!-- Statistics Screen -->
     <string name="stats_title">統計</string>
-    <string name="stats_empty_title">記録がありません</string>
+    <string name="stats_empty_title">まだ記録がありません</string>
     <string name="stats_empty_subtitle">ゲームをプレイして進捗を確認しましょう！</string>
-    <string name="stats_lifetime_overview">ライフタイム概要</string>
+    <string name="stats_lifetime_overview">生涯概要</string>
     <string name="stats_games">ゲーム数</string>
     <string name="stats_best">ベスト</string>
     <string name="stats_avg">平均</string>
     <string name="stats_count_games">%1$d ゲーム</string>
     <string name="stats_grid_format">%1$dx%2$d グリッド</string>
+    <string name="stats_date_format">MM月dd日 HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">%1$d × %2$d エディション - %3$s</string>
     <string name="game_score">スコア</string>
     <string name="game_over">ゲームオーバー</string>
     <string name="game_final_score_format">最終スコア: %1$d</string>
-    <string name="game_try_again">もう一度挑戦</string>
+    <string name="game_try_again">もう一度やり直す</string>
+    <string name="game_restart_dialog_title">ゲームを再開</string>
+    <string name="game_restart_dialog_message">新しいゲームを始めてもよろしいですか？ 現在の進行状況は失われます。</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">カジュアル</string>

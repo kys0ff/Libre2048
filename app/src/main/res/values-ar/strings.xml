@@ -5,6 +5,7 @@
     <string name="common_close">إغلاق</string>
     <string name="common_restart">إعادة التشغيل</string>
     <string name="common_undo">تراجع</string>
+    <string name="common_cancel">إلغاء</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">الأوضاع المربعة</string>
@@ -29,6 +30,8 @@
     <string name="stats_avg">المتوسط</string>
     <string name="stats_count_games">%1$d ألعاب</string>
     <string name="stats_grid_format">شبكة %1$dx%2$d</string>
+    <string name="stats_date_format">dd MMM · HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">إصدار %1$d × %2$d - %3$s</string>
@@ -36,6 +39,8 @@
     <string name="game_over">انتهت اللعبة</string>
     <string name="game_final_score_format">النتيجة النهائية: %1$d</string>
     <string name="game_try_again">حاول مرة أخرى</string>
+    <string name="game_restart_dialog_title">إعادة تشغيل اللعبة</string>
+    <string name="game_restart_dialog_message">هل أنت متأكد أنك تريد بدء لعبة جديدة؟ سيتم فقدان تقدمك الحالي.</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">كاجوال</string>

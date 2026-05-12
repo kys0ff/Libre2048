@@ -5,6 +5,7 @@
     <string name="common_close">Fermer</string>
     <string name="common_restart">Redémarrer</string>
     <string name="common_undo">Annuler</string>
+    <string name="common_cancel">Annuler</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">Modes carrés</string>
@@ -29,6 +30,8 @@
     <string name="stats_avg">Moy.</string>
     <string name="stats_count_games">%1$d jeux</string>
     <string name="stats_grid_format">Grille %1$dx%2$d</string>
+    <string name="stats_date_format">dd MMM · HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">Édition %1$d × %2$d - %3$s</string>
@@ -36,6 +39,8 @@
     <string name="game_over">Fin de partie</string>
     <string name="game_final_score_format">Score final : %1$d</string>
     <string name="game_try_again">Réessayer</string>
+    <string name="game_restart_dialog_title">Recommencer le jeu</string>
+    <string name="game_restart_dialog_message">Êtes-vous sûr de vouloir commencer une nouvelle partie ? Votre progression actuelle sera perdue.</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">Décontracté</string>

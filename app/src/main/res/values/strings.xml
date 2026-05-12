@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Libre2048</string>
+    <string name="game_title" translatable="false">2048</string>
 
     <!-- Common -->
     <string name="common_back">Back</string>
@@ -7,6 +8,7 @@
     <string name="common_close">Close</string>
     <string name="common_restart">Restart</string>
     <string name="common_undo">Undo</string>
+    <string name="common_cancel">Cancel</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">Square Modes</string>
@@ -30,7 +32,9 @@
     <string name="stats_best">Best</string>
     <string name="stats_avg">Avg</string>
     <string name="stats_count_games">%1$d Games</string>
-    <string name="stats_grid_format">%1$dx%2$d Grid</string>
+    <string name="stats_grid_format">%1$d × %2$d Grid</string>
+    <string name="stats_date_format">MMM dd · HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">%1$d × %2$d Edition - %3$s</string>
@@ -38,6 +42,8 @@
     <string name="game_over">Game Over</string>
     <string name="game_final_score_format">Final Score: %1$d</string>
     <string name="game_try_again">Try Again</string>
+    <string name="game_restart_dialog_title">Restart Game</string>
+    <string name="game_restart_dialog_message">Are you sure you want to start a new game? Your current progress will be lost.</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">Casual</string>

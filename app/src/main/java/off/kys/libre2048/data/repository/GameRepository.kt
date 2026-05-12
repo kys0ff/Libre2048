@@ -23,6 +23,7 @@ class GameRepository(private val context: Context) {
     companion object {
         private const val HIGH_SCORE_KEY_PREFIX = "high_score_"
         private const val STATE_KEY_PREFIX = "current_state_"
+        private const val HISTORY_KEY_PREFIX = "history_"
         private val ALL_SCORES_KEY = stringPreferencesKey("all_scores")
     }
 
@@ -85,6 +86,29 @@ class GameRepository(private val context: Context) {
                 preferences.remove(key)
             } else {
                 preferences[key] = json.encodeToString(state)
+            }
+        }
+    }
+
+    fun getHistory(rows: Int, cols: Int): Flow<List<GameState>> =
+        context.dataStore.data.map { preferences ->
+            val key = stringPreferencesKey("${HISTORY_KEY_PREFIX}${rows}x${cols}")
+            preferences[key]?.let {
+                try {
+                    json.decodeFromString<List<GameState>>(it)
+                } catch (_: Exception) {
+                    emptyList()
+                }
+            } ?: emptyList()
+        }
+
+    suspend fun saveHistory(rows: Int, cols: Int, history: List<GameState>) {
+        val key = stringPreferencesKey("${HISTORY_KEY_PREFIX}${rows}x${cols}")
+        context.dataStore.edit { preferences ->
+            if (history.isEmpty()) {
+                preferences.remove(key)
+            } else {
+                preferences[key] = json.encodeToString(history)
             }
         }
     }

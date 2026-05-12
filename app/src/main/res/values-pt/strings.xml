@@ -5,6 +5,7 @@
     <string name="common_close">Fechar</string>
     <string name="common_restart">Reiniciar</string>
     <string name="common_undo">Desfazer</string>
+    <string name="common_cancel">Cancelar</string>
 
     <!-- Main Screen -->
     <string name="main_square_modes">Modos Quadrados</string>
@@ -21,14 +22,16 @@
 
     <!-- Statistics Screen -->
     <string name="stats_title">Estatísticas</string>
-    <string name="stats_empty_title">Nenhum jogo gravado</string>
-    <string name="stats_empty_subtitle">Jogue uma partida para ver o seu progresso aqui!</string>
+    <string name="stats_empty_title">Nenhum jogo gravado ainda</string>
+    <string name="stats_empty_subtitle">Jogue um jogo para ver seu progresso aqui!</string>
     <string name="stats_lifetime_overview">Visão Geral</string>
     <string name="stats_games">Jogos</string>
     <string name="stats_best">Melhor</string>
-    <string name="stats_avg">Méd.</string>
+    <string name="stats_avg">Média</string>
     <string name="stats_count_games">%1$d Jogos</string>
-    <string name="stats_grid_format">Grelha %1$dx%2$d</string>
+    <string name="stats_grid_format">Grade %1$dx%2$d</string>
+    <string name="stats_date_format">dd MMM · HH:mm</string>
+    <string name="stats_score_format">%,d</string>
 
     <!-- Game Screen -->
     <string name="game_mode_title_format">Edição %1$d × %2$d - %3$s</string>
@@ -36,6 +39,8 @@
     <string name="game_over">Fim de Jogo</string>
     <string name="game_final_score_format">Pontuação Final: %1$d</string>
     <string name="game_try_again">Tentar Novamente</string>
+    <string name="game_restart_dialog_title">Reiniciar Jogo</string>
+    <string name="game_restart_dialog_message">Tem certeza de que deseja iniciar um novo jogo? Seu progresso atual será perdido.</string>
 
     <!-- Game Modes -->
     <string name="mode_casual">Casual</string>
