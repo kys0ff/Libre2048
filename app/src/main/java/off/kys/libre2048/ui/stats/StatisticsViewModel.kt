@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import off.kys.libre2048.data.repository.GameRepository
 
 class StatisticsViewModel(private val repository: GameRepository) : ViewModel() {
@@ -14,6 +15,9 @@ class StatisticsViewModel(private val repository: GameRepository) : ViewModel() 
     val uiState: StateFlow<StatisticsUiState> = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            repository.deleteDuplicateScores()
+        }
         loadStatistics()
     }
 

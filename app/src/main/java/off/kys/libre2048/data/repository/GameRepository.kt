@@ -68,6 +68,30 @@ class GameRepository(private val context: Context) {
         }
     }
 
+    suspend fun deleteDuplicateScores() {
+        context.dataStore.edit { preferences ->
+            val currentScores = preferences[ALL_SCORES_KEY]?.let {
+                try {
+                    json.decodeFromString<List<GameScore>>(it)
+                } catch (_: Exception) {
+                    emptyList()
+                }
+            } ?: emptyList()
+
+            if (currentScores.isEmpty()) return@edit
+
+            // Deduplicate: Keep only the most recent entry for each unique combination of score and game configuration
+            val uniqueScores = currentScores
+                .groupBy { "${it.score}_${it.rows}_${it.cols}_${it.mode}" }
+                .map { (_, scores) -> scores.maxByOrNull { it.date }!! }
+                .sortedByDescending { it.date }
+
+            if (uniqueScores.size < currentScores.size) {
+                preferences[ALL_SCORES_KEY] = json.encodeToString(uniqueScores)
+            }
+        }
+    }
+
     fun getCurrentState(rows: Int, cols: Int): Flow<GameState?> = context.dataStore.data.map { preferences ->
         val key = stringPreferencesKey("${STATE_KEY_PREFIX}${rows}x${cols}")
         preferences[key]?.let {

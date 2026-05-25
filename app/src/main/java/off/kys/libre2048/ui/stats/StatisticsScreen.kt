@@ -164,7 +164,6 @@ class StatisticsScreen : Screen {
             modifier = Modifier.padding(16.dp),
             shape = MaterialTheme.shapes.extraLarge,
             color = MaterialTheme.colorScheme.primaryContainer,
-            tonalElevation = 2.dp
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
