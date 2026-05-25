@@ -26,6 +26,7 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     private val history = Stack<GameState>()
     private var tileIdCounter = 0
+    private var isScoreSaved = false
 
     init {
         viewModelScope.launch {
@@ -33,7 +34,8 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
                 if (state.grid.isNotEmpty()) {
                     repository.saveCurrentState(state.rows, state.cols, state)
                     repository.saveHighScore(state.rows, state.cols, state.mode, state.score)
-                    if (state.isGameOver) {
+                    if (state.isGameOver && !isScoreSaved) {
+                        isScoreSaved = true
                         repository.saveScore(
                             GameScore(
                                 score = state.score,
@@ -43,6 +45,8 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
                                 mode = state.mode
                             )
                         )
+                    } else if (!state.isGameOver) {
+                        isScoreSaved = false
                     }
                 }
             }
@@ -75,6 +79,7 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
             repository.saveHistory(rows, cols, emptyList())
         }
         tileIdCounter = 0
+        isScoreSaved = false
         val initialState = GameState(
             grid = List(rows) { List(cols) { null } },
             rows = rows,

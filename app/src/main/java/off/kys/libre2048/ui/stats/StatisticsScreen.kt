@@ -104,7 +104,7 @@ class StatisticsScreen : Screen {
 
                             items(
                                 items = modeScores.sortedByDescending { it.date },
-                                key = { it.score }
+                                key = { "${it.date}_${it.score}" }
                             ) { score ->
                                 ScoreItem(score)
                             }
