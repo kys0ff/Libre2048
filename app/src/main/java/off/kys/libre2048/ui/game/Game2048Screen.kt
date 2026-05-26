@@ -57,6 +57,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.transitions.SlideTransition
 import off.kys.libre2048.R
 import off.kys.libre2048.di.appModule
 import off.kys.libre2048.domain.model.GameMode
@@ -452,7 +453,9 @@ private fun Game2048ScreenPreview() {
             }
         ), content = {
             Libre2048Theme {
-                Navigator(Game2048Screen())
+                Navigator(Game2048Screen()) { navigator ->
+                    SlideTransition(navigator)
+                }
             }
         }
     )

@@ -74,6 +74,7 @@ dependencies {
 
     // Navigation & Data
     implementation(libs.voyager.navigator)
+    implementation(libs.voyager.transitions)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
 
