@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import off.kys.libre2048.domain.model.Direction
 import off.kys.libre2048.domain.model.Tile
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
@@ -67,7 +68,6 @@ fun ScoreCard(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
-        tonalElevation = 4.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
         Column(
@@ -134,8 +134,8 @@ fun GameBoard(
                         if (!hasMovedThisGesture) {
                             totalDragX += dragAmount.x
                             totalDragY += dragAmount.y
-                            val absX = kotlin.math.abs(totalDragX)
-                            val absY = kotlin.math.abs(totalDragY)
+                            val absX = abs(totalDragX)
+                            val absY = abs(totalDragY)
                             if (absX > threshold || absY > threshold) {
                                 if (absX > absY) {
                                     onMove(if (totalDragX > 0) Direction.RIGHT else Direction.LEFT)
@@ -189,8 +189,6 @@ fun GameBoard(
 
 @Composable
 fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
-    val density = LocalDensity.current
-
     val xOffset by animateDpAsState(
         targetValue = (tileSize + gap) * tile.x,
         animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 300f),
@@ -235,7 +233,6 @@ fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
             .graphicsLayer {
                 scaleX = scale.value
                 scaleY = scale.value
-                shadowElevation = with(density) { 2.dp.toPx() }
                 shape = RoundedCornerShape(4.dp)
                 clip = true
             }
