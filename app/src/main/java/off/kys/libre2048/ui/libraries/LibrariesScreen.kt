@@ -38,7 +38,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import off.kys.libre2048.R
 import off.kys.libre2048.domain.model.Library
-import off.kys.libre2048.ui.about.LibrariesProvider
 import off.kys.libre2048.ui.about.SquircleShape
 import off.kys.libre2048.ui.theme.Libre2048Theme
 
@@ -55,12 +54,7 @@ class LibrariesScreen : Screen {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 LargeTopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.about_libraries),
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
+                    title = { Text(text = stringResource(R.string.about_libraries)) },
                     navigationIcon = {
                         IconButton(onClick = { navigator?.pop() }) {
                             Icon(

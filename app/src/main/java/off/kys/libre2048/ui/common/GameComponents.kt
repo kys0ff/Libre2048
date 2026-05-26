@@ -299,6 +299,7 @@ fun GameBoardPreview(
 ) {
     val theme = MaterialTheme.colorScheme
     val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
     val containerBgColor = theme.surfaceVariant.copy(alpha = 0.3f)
 
     Box(
@@ -341,12 +342,26 @@ fun GameBoardPreview(
 
                     if (tile != null) {
                         val textString = tile.value.toString()
-                        val textStyle = TextStyle(
+
+                        val maxTextWidth = tileSize * 0.85f
+                        val baseFontSize = tileSize * 0.4f
+
+                        var textStyle = TextStyle(
                             color = tileTextColor,
-                            fontSize = (tileSize * 0.4f).toSp(),
+                            fontSize = with(density) { baseFontSize.toSp() },
                             fontWeight = FontWeight.Bold
                         )
-                        val textLayoutResult = textMeasurer.measure(textString, textStyle)
+                        var textLayoutResult = textMeasurer.measure(textString, textStyle)
+
+                        if (textLayoutResult.size.width > maxTextWidth && textString.isNotEmpty()) {
+                            val scaleFactor = maxTextWidth / textLayoutResult.size.width
+                            val shrunkFontSize = baseFontSize * scaleFactor
+
+                            textStyle = textStyle.copy(
+                                fontSize = with(density) { shrunkFontSize.toSp() }
+                            )
+                            textLayoutResult = textMeasurer.measure(textString, textStyle)
+                        }
 
                         drawText(
                             textMeasurer = textMeasurer,

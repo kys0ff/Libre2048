@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -103,7 +102,6 @@ class MainScreen : Screen {
             val isSmall = maxWidth < 360.dp || maxHeight < 600.dp
             val dimens = AdaptiveDimens(
                 topPadding = if (isSmall) 4.dp else 12.dp,
-                infoIconPadding = if (isSmall) 8.dp else 12.dp,
                 infoIconSize = if (isSmall) 20.dp else 24.dp,
                 fabPadding = if (isSmall) 4.dp else 8.dp,
                 titleTopSpacer = if (isSmall) 20.dp else 48.dp,
@@ -122,27 +120,6 @@ class MainScreen : Screen {
             )
 
             Scaffold(
-                topBar = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .statusBarsPadding()
-                            .padding(horizontal = dimens.topPadding, vertical = dimens.topPadding)
-                    ) {
-                        IconButton(
-                            onClick = { navigator += AboutScreen() },
-                            modifier = Modifier.align(Alignment.TopEnd)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_info_24px),
-                                contentDescription = stringResource(R.string.about_title),
-                                modifier = Modifier
-                                    .padding(dimens.infoIconPadding)
-                                    .size(dimens.infoIconSize),
-                            )
-                        }
-                    }
-                },
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = { navigator += StatisticsScreen() },
@@ -163,6 +140,23 @@ class MainScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = dimens.topPadding, vertical = dimens.topPadding)
+                    ) {
+                        IconButton(
+                            onClick = { navigator += AboutScreen() },
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.round_info_24px),
+                                contentDescription = stringResource(R.string.about_title),
+                                modifier = Modifier.size(dimens.infoIconSize),
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(dimens.titleTopSpacer))
 
                     Text(
@@ -413,7 +407,6 @@ class MainScreen : Screen {
 
 private data class AdaptiveDimens(
     val topPadding: Dp,
-    val infoIconPadding: Dp,
     val infoIconSize: Dp,
     val fabPadding: Dp,
     val titleTopSpacer: Dp,

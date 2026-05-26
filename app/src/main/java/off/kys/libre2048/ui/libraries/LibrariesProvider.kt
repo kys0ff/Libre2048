@@ -1,4 +1,4 @@
-package off.kys.libre2048.ui.about
+package off.kys.libre2048.ui.libraries
 
 import off.kys.libre2048.domain.model.Library
 

@@ -79,12 +79,7 @@ class AboutScreen : Screen {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 LargeTopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.about_title),
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
+                    title = { Text(text = stringResource(R.string.about_title)) },
                     navigationIcon = {
                         IconButton(onClick = { navigator?.pop() }) {
                             Icon(
