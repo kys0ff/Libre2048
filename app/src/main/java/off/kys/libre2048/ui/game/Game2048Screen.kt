@@ -51,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -95,19 +96,19 @@ class Game2048Screen(
             GameMode.HARDCORE -> stringResource(R.string.mode_hardcore)
         }
 
-        fun startNewGame() {
-            viewModel.onEvent(
-                GameEvent.StartNewGame(
-                    state.rows,
-                    state.cols,
-                    state.mode
-                )
-            )
-        }
+        val restartGameAction =
+            { viewModel.onEvent(GameEvent.StartNewGame(state.rows, state.cols, state.mode)) }
 
         BoxWithConstraints {
             val isExpanded = maxWidth >= 600.dp
             val isCompactHeight = maxHeight < 580.dp
+            val layout = AdaptiveGameLayout(
+                isExpanded = isExpanded,
+                isCompactHeight = isCompactHeight,
+                outerPadding = if (isCompactHeight) 8.dp else if (isExpanded) 24.dp else 16.dp,
+                contentSpacing = if (isCompactHeight) 12.dp else if (isExpanded) 32.dp else 24.dp,
+                boardMaxHeight = if (isCompactHeight) 280.dp else 450.dp
+            )
 
             Scaffold(
                 topBar = {
@@ -115,15 +116,14 @@ class Game2048Screen(
                         rows = state.rows,
                         cols = state.cols,
                         modeLabel = modeLabel,
-                        isExpanded = isExpanded,
-                        isCompactHeight = isCompactHeight,
+                        layout = layout,
                         onBack = { navigator.pop() },
                         onRestart = {
                             if (state.isGameOver) {
-                                startNewGame()
-                                return@GameTopBar
+                                restartGameAction()
+                            } else {
+                                showRestartDialog.value = true
                             }
-                            showRestartDialog.value = true
                         }
                     )
                 }
@@ -131,20 +131,22 @@ class Game2048Screen(
                 if (showRestartDialog.value) {
                     RestartGameDialog(
                         onConfirm = {
-                            startNewGame()
+                            restartGameAction()
                             showRestartDialog.value = false
                         },
                         onDismiss = { showRestartDialog.value = false }
                     )
                 }
 
-                if (isExpanded) {
+                val boardRatio = state.cols.toFloat() / state.rows.toFloat()
+
+                if (layout.isExpanded) {
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(padding)
-                            .padding(24.dp),
-                        horizontalArrangement = Arrangement.spacedBy(32.dp),
+                            .padding(layout.outerPadding),
+                        horizontalArrangement = Arrangement.spacedBy(layout.contentSpacing),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(
@@ -154,11 +156,8 @@ class Game2048Screen(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            GameScoreHeader(
-                                currentScore = state.score,
-                                highScore = highScore
-                            )
-                            Spacer(modifier = Modifier.height(32.dp))
+                            GameScoreHeader(currentScore = state.score, highScore = highScore)
+                            Spacer(modifier = Modifier.height(layout.contentSpacing))
                             GameControls(
                                 canUndo = state.canUndo,
                                 isCompact = false,
@@ -166,49 +165,42 @@ class Game2048Screen(
                                 onStatistics = { navigator += StatisticsScreen() }
                             )
                         }
-
                         Box(
                             modifier = Modifier
                                 .weight(1.2f)
                                 .fillMaxHeight()
                                 .sizeIn(maxWidth = 500.dp, maxHeight = 500.dp)
-                                .aspectRatio(state.cols.toFloat() / state.rows.toFloat())
+                                .aspectRatio(boardRatio)
                                 .align(Alignment.CenterVertically)
                         ) {
-                            GameBoardBlock(state, viewModel)
+                            GameBoardBlock(state, viewModel, restartGameAction)
                         }
                     }
                 } else {
-                    val dynamicSpacing = if (isCompactHeight) 12.dp else 24.dp
-                    val outerPadding = if (isCompactHeight) 8.dp else 16.dp
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(padding)
-                            .padding(outerPadding)
+                            .padding(layout.outerPadding)
                             .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(dynamicSpacing)
+                        verticalArrangement = Arrangement.spacedBy(layout.contentSpacing)
                     ) {
-                        GameScoreHeader(
-                            currentScore = state.score,
-                            highScore = highScore
-                        )
+                        GameScoreHeader(currentScore = state.score, highScore = highScore)
 
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(weight = 1f, fill = !isCompactHeight)
-                                .heightIn(max = if (isCompactHeight) 280.dp else 450.dp)
-                                .aspectRatio(state.cols.toFloat() / state.rows.toFloat())
+                                .weight(weight = 1f, fill = !layout.isCompactHeight)
+                                .heightIn(max = layout.boardMaxHeight)
+                                .aspectRatio(boardRatio)
                         ) {
-                            GameBoardBlock(state, viewModel)
+                            GameBoardBlock(state, viewModel, restartGameAction)
                         }
 
                         GameControls(
                             canUndo = state.canUndo,
-                            isCompact = isCompactHeight,
+                            isCompact = layout.isCompactHeight,
                             onUndo = { viewModel.onEvent(GameEvent.Undo) },
                             onStatistics = { navigator += StatisticsScreen() }
                         )
@@ -219,26 +211,14 @@ class Game2048Screen(
     }
 
     @Composable
-    private fun GameBoardBlock(state: GameState, viewModel: GameViewModel) {
+    private fun GameBoardBlock(state: GameState, viewModel: GameViewModel, onRestart: () -> Unit) {
         GameBoard(
             grid = state.grid,
             rows = state.rows,
             cols = state.cols,
             onMove = { if (!state.isGameOver) viewModel.onEvent(GameEvent.Move(it)) }
         )
-        GameOverOverlay(
-            isGameOver = state.isGameOver,
-            score = state.score,
-            onRestart = {
-                viewModel.onEvent(
-                    GameEvent.StartNewGame(
-                        state.rows,
-                        state.cols,
-                        state.mode
-                    )
-                )
-            }
-        )
+        GameOverOverlay(isGameOver = state.isGameOver, score = state.score, onRestart = onRestart)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -247,8 +227,7 @@ class Game2048Screen(
         rows: Int,
         cols: Int,
         modeLabel: String,
-        isExpanded: Boolean,
-        isCompactHeight: Boolean,
+        layout: AdaptiveGameLayout,
         onBack: () -> Unit,
         onRestart: () -> Unit
     ) {
@@ -256,9 +235,9 @@ class Game2048Screen(
             Column {
                 Text(
                     text = stringResource(R.string.game_title),
-                    style = if (isCompactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge
+                    style = if (layout.isCompactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge
                 )
-                if (!isCompactHeight) {
+                if (!layout.isCompactHeight) {
                     Text(
                         stringResource(R.string.game_mode_title_format, rows, cols, modeLabel),
                         style = MaterialTheme.typography.bodyMedium,
@@ -286,18 +265,16 @@ class Game2048Screen(
             }
         }
 
-        if (isExpanded || isCompactHeight) {
+        if (layout.isExpanded || layout.isCompactHeight) {
             TopAppBar(
                 title = titleContent,
                 navigationIcon = navigationIconContent,
-                actions = { actionsContent() }
-            )
+                actions = { actionsContent() })
         } else {
             LargeTopAppBar(
                 title = titleContent,
                 navigationIcon = navigationIconContent,
-                actions = { actionsContent() }
-            )
+                actions = { actionsContent() })
         }
     }
 
@@ -356,10 +333,7 @@ class Game2048Screen(
     }
 
     @Composable
-    private fun GameScoreHeader(
-        currentScore: Int,
-        highScore: Int
-    ) {
+    private fun GameScoreHeader(currentScore: Int, highScore: Int) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -380,20 +354,14 @@ class Game2048Screen(
     }
 
     @Composable
-    private fun GameOverOverlay(
-        isGameOver: Boolean,
-        score: Int,
-        onRestart: () -> Unit
-    ) {
-        AnimatedVisibility(
-            visible = isGameOver,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
+    private fun GameOverOverlay(isGameOver: Boolean, score: Int, onRestart: () -> Unit) {
+        AnimatedVisibility(visible = isGameOver, enter = fadeIn(), exit = fadeOut()) {
             Card(
                 modifier = Modifier.fillMaxSize(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
+                    containerColor = MaterialTheme.colorScheme.surface.copy(
+                        alpha = 0.85f
+                    )
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -414,10 +382,7 @@ class Game2048Screen(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    Button(
-                        onClick = onRestart,
-                        shape = MaterialTheme.shapes.medium
-                    ) {
+                    Button(onClick = onRestart, shape = MaterialTheme.shapes.medium) {
                         Icon(painterResource(R.drawable.round_refresh_24), null)
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.game_try_again))
@@ -435,44 +400,45 @@ class Game2048Screen(
         onStatistics: () -> Unit
     ) {
         val buttonHeight = if (isCompact) 44.dp else 56.dp
+        val rowModifier = Modifier.fillMaxWidth()
+        val btnShape = MaterialTheme.shapes.medium
+        val spaceModifier = Modifier.width(8.dp)
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(modifier = rowModifier, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(
                 onClick = onUndo,
                 modifier = Modifier
                     .weight(1f)
                     .height(buttonHeight),
                 enabled = canUndo,
-                shape = MaterialTheme.shapes.medium
+                shape = btnShape
             ) {
                 Icon(painterResource(R.drawable.round_undo_24), null)
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.common_undo),
-                    maxLines = 1
-                )
+                Spacer(spaceModifier)
+                Text(text = stringResource(R.string.common_undo), maxLines = 1)
             }
-
             FilledTonalButton(
                 onClick = onStatistics,
                 modifier = Modifier
                     .weight(1f)
                     .height(buttonHeight),
-                shape = MaterialTheme.shapes.medium
+                shape = btnShape
             ) {
                 Icon(painterResource(R.drawable.round_leaderboard_24), null)
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.common_stats),
-                    maxLines = 1
-                )
+                Spacer(spaceModifier)
+                Text(text = stringResource(R.string.common_stats), maxLines = 1)
             }
         }
     }
 }
+
+private data class AdaptiveGameLayout(
+    val isExpanded: Boolean,
+    val isCompactHeight: Boolean,
+    val outerPadding: Dp,
+    val contentSpacing: Dp,
+    val boardMaxHeight: Dp
+)
 
 @Preview(device = "id:pixel_10")
 @Composable

@@ -69,26 +69,6 @@ import org.koin.dsl.koinConfiguration
 
 class MainScreen : Screen {
 
-    private data class AdaptiveDimens(
-        val topPadding: Dp,
-        val infoIconPadding: Dp,
-        val infoIconSize: Dp,
-        val fabPadding: Dp,
-        val titleTopSpacer: Dp,
-        val titleFontSize: TextUnit,
-        val titleLineHeight: TextUnit,
-        val sectionSpacer: Dp,
-        val listSectionSpacer: Dp,
-        val textHorizontalPadding: Dp,
-        val listHorizontalPadding: Dp,
-        val listSpacing: Dp,
-        val cardWidth: Dp,
-        val cardPadding: Dp,
-        val previewSize: Dp,
-        val btnFontSize: TextUnit,
-        val headingStyle: @Composable () -> TextStyle
-    )
-
     companion object {
         private val SQUARE_MODES =
             listOf(BoardConfig(4, 4), BoardConfig(5, 5), BoardConfig(6, 6), BoardConfig(8, 8))
@@ -430,6 +410,26 @@ class MainScreen : Screen {
         }
     }
 }
+
+private data class AdaptiveDimens(
+    val topPadding: Dp,
+    val infoIconPadding: Dp,
+    val infoIconSize: Dp,
+    val fabPadding: Dp,
+    val titleTopSpacer: Dp,
+    val titleFontSize: TextUnit,
+    val titleLineHeight: TextUnit,
+    val sectionSpacer: Dp,
+    val listSectionSpacer: Dp,
+    val textHorizontalPadding: Dp,
+    val listHorizontalPadding: Dp,
+    val listSpacing: Dp,
+    val cardWidth: Dp,
+    val cardPadding: Dp,
+    val previewSize: Dp,
+    val btnFontSize: TextUnit,
+    val headingStyle: @Composable () -> TextStyle
+)
 
 @Preview(device = "id:pixel_tablet")
 @Composable
