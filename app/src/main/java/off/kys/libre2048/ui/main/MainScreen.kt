@@ -40,8 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -66,22 +69,31 @@ import org.koin.dsl.koinConfiguration
 
 class MainScreen : Screen {
 
-    companion object {
-        private val SQUARE_MODES: List<BoardConfig>
-            get() = listOf(
-                BoardConfig(4, 4),
-                BoardConfig(5, 5),
-                BoardConfig(6, 6),
-                BoardConfig(8, 8)
-            )
+    private data class AdaptiveDimens(
+        val topPadding: Dp,
+        val infoIconPadding: Dp,
+        val infoIconSize: Dp,
+        val fabPadding: Dp,
+        val titleTopSpacer: Dp,
+        val titleFontSize: TextUnit,
+        val titleLineHeight: TextUnit,
+        val sectionSpacer: Dp,
+        val listSectionSpacer: Dp,
+        val textHorizontalPadding: Dp,
+        val listHorizontalPadding: Dp,
+        val listSpacing: Dp,
+        val cardWidth: Dp,
+        val cardPadding: Dp,
+        val previewSize: Dp,
+        val btnFontSize: TextUnit,
+        val headingStyle: @Composable () -> TextStyle
+    )
 
-        private val RECT_MODES: List<BoardConfig>
-            get() = listOf(
-                BoardConfig(3, 5),
-                BoardConfig(4, 6),
-                BoardConfig(5, 8),
-                BoardConfig(6, 9)
-            )
+    companion object {
+        private val SQUARE_MODES =
+            listOf(BoardConfig(4, 4), BoardConfig(5, 5), BoardConfig(6, 6), BoardConfig(8, 8))
+        private val RECT_MODES =
+            listOf(BoardConfig(3, 5), BoardConfig(4, 6), BoardConfig(5, 8), BoardConfig(6, 9))
     }
 
     @Composable
@@ -106,15 +118,33 @@ class MainScreen : Screen {
         }
 
         BoxWithConstraints {
-            val isSmallScreen = maxWidth < 360.dp || maxHeight < 600.dp
+            val isSmall = maxWidth < 360.dp || maxHeight < 600.dp
+            val dimens = AdaptiveDimens(
+                topPadding = if (isSmall) 4.dp else 12.dp,
+                infoIconPadding = if (isSmall) 8.dp else 12.dp,
+                infoIconSize = if (isSmall) 20.dp else 24.dp,
+                fabPadding = if (isSmall) 4.dp else 16.dp,
+                titleTopSpacer = if (isSmall) 20.dp else 48.dp,
+                titleFontSize = if (isSmall) 48.sp else 80.sp,
+                titleLineHeight = if (isSmall) 52.sp else 86.sp,
+                sectionSpacer = if (isSmall) 16.dp else 32.dp,
+                listSectionSpacer = if (isSmall) 12.dp else 24.dp,
+                textHorizontalPadding = if (isSmall) 16.dp else 24.dp,
+                listHorizontalPadding = if (isSmall) 12.dp else 16.dp,
+                listSpacing = if (isSmall) 8.dp else 12.dp,
+                cardWidth = if (isSmall) 115.dp else 140.dp,
+                cardPadding = if (isSmall) 8.dp else 12.dp,
+                previewSize = if (isSmall) 75.dp else 100.dp,
+                btnFontSize = if (isSmall) 10.sp else 12.sp,
+                headingStyle = { if (isSmall) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall }
+            )
 
             Scaffold(
                 topBar = {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = if (isSmallScreen) 4.dp else 12.dp)
-                            .padding(top = if (isSmallScreen) 4.dp else 12.dp)
+                            .padding(horizontal = dimens.topPadding, vertical = dimens.topPadding)
                     ) {
                         Surface(
                             onClick = { navigator += AboutScreen() },
@@ -123,11 +153,11 @@ class MainScreen : Screen {
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.round_sentiment_satisfied_alt_24), // Using a smiley as a placeholder for info/about
+                                painter = painterResource(R.drawable.round_info_24px),
                                 contentDescription = stringResource(R.string.about_title),
                                 modifier = Modifier
-                                    .padding(if (isSmallScreen) 8.dp else 12.dp)
-                                    .size(if (isSmallScreen) 20.dp else 24.dp),
+                                    .padding(dimens.infoIconPadding)
+                                    .size(dimens.infoIconSize),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -136,7 +166,7 @@ class MainScreen : Screen {
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = { navigator += StatisticsScreen() },
-                        modifier = Modifier.padding(if (isSmallScreen) 4.dp else 16.dp)
+                        modifier = Modifier.padding(dimens.fabPadding)
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.round_bar_chart_24),
@@ -153,78 +183,66 @@ class MainScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
-                    Spacer(modifier = Modifier.height(if (isSmallScreen) 20.dp else 48.dp))
+                    Spacer(modifier = Modifier.height(dimens.titleTopSpacer))
 
                     Text(
                         text = stringResource(R.string.game_title),
                         style = MaterialTheme.typography.displayLarge,
                         fontWeight = FontWeight.Black,
-                        fontSize = if (isSmallScreen) 48.sp else 80.sp,
+                        fontSize = dimens.titleFontSize,
                         color = MaterialTheme.colorScheme.primary,
-                        lineHeight = if (isSmallScreen) 52.sp else 86.sp
+                        lineHeight = dimens.titleLineHeight
                     )
 
-                    Spacer(modifier = Modifier.height(if (isSmallScreen) 16.dp else 32.dp))
+                    Spacer(modifier = Modifier.height(dimens.sectionSpacer))
 
-                    Text(
-                        text = stringResource(R.string.main_square_modes),
-                        style = if (isSmallScreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
-                            .align(Alignment.Start)
-                    )
-                    ModeRow(
+                    ModeSection(
+                        R.string.main_square_modes,
                         SQUARE_MODES,
                         repository,
                         navigator,
-                        isSmallScreen
+                        dimens
                     ) { selectedBoardConfig.value = it }
-
-                    Spacer(modifier = Modifier.height(if (isSmallScreen) 12.dp else 24.dp))
-
-                    Text(
-                        text = stringResource(R.string.main_rectangular_modes),
-                        style = if (isSmallScreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
-                            .align(Alignment.Start)
-                    )
-                    ModeRow(
+                    Spacer(modifier = Modifier.height(dimens.listSectionSpacer))
+                    ModeSection(
+                        R.string.main_rectangular_modes,
                         RECT_MODES,
                         repository,
                         navigator,
-                        isSmallScreen
+                        dimens
                     ) { selectedBoardConfig.value = it }
 
-                    Spacer(modifier = Modifier.height(if (isSmallScreen) 16.dp else 32.dp))
+                    Spacer(modifier = Modifier.height(dimens.sectionSpacer))
                 }
             }
         }
     }
 
     @Composable
-    private fun ModeRow(
+    private fun ModeSection(
+        titleRes: Int,
         modes: List<BoardConfig>,
         repository: GameRepository,
         navigator: Navigator,
-        isSmallScreen: Boolean,
+        dimens: AdaptiveDimens,
         onBoardClick: (BoardConfig) -> Unit
     ) {
+        Text(
+            text = stringResource(titleRes),
+            style = dimens.headingStyle(),
+            modifier = Modifier
+                .padding(horizontal = dimens.textHorizontalPadding)
+                .fillMaxWidth()
+        )
         LazyRow(
             contentPadding = PaddingValues(
-                horizontal = if (isSmallScreen) 12.dp else 16.dp,
+                horizontal = dimens.listHorizontalPadding,
                 vertical = 8.dp
             ),
-            horizontalArrangement = Arrangement.spacedBy(if (isSmallScreen) 8.dp else 12.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimens.listSpacing)
         ) {
             items(modes) { mode ->
-                ModeCard(
-                    config = mode,
-                    repository = repository,
-                    navigator = navigator,
-                    isSmallScreen = isSmallScreen,
-                    onBoardClick = onBoardClick
-                )
+                ModeCard(mode, repository, navigator, dimens, onBoardClick)
             }
         }
     }
@@ -234,17 +252,14 @@ class MainScreen : Screen {
         config: BoardConfig,
         repository: GameRepository,
         navigator: Navigator,
-        isSmallScreen: Boolean,
+        dimens: AdaptiveDimens,
         onBoardClick: (BoardConfig) -> Unit
     ) {
         val savedState by repository.getCurrentState(config.rows, config.cols)
             .collectAsState(initial = null)
 
-        val cardWidth = if (isSmallScreen) 115.dp else 140.dp
-        val previewSize = if (isSmallScreen) 75.dp else 100.dp
-
         Card(
-            modifier = Modifier.width(cardWidth),
+            modifier = Modifier.width(dimens.cardWidth),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
                     alpha = 0.5f
@@ -252,22 +267,25 @@ class MainScreen : Screen {
             )
         ) {
             Column(
-                modifier = Modifier.padding(if (isSmallScreen) 8.dp else 12.dp),
+                modifier = Modifier.padding(dimens.cardPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 GameBoardPreview(
                     rows = config.rows,
                     cols = config.cols,
-                    modifier = Modifier.size(previewSize),
+                    modifier = Modifier.size(dimens.previewSize),
                     gameState = savedState
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = stringResource(R.string.stats_grid_format, config.rows, config.cols),
-                    style = if (isSmallScreen) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+                    style = if (dimens.cardWidth < 140.dp) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(6.dp))
+
+                val modifierMaxWidth = Modifier.fillMaxWidth()
+                val zeroPadding = PaddingValues(0.dp)
 
                 if (savedState != null) {
                     Button(
@@ -278,35 +296,26 @@ class MainScreen : Screen {
                                 resume = true
                             )
                         },
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(0.dp)
+                        modifier = modifierMaxWidth,
+                        contentPadding = zeroPadding
                     ) {
-                        Text(
-                            stringResource(R.string.main_resume),
-                            fontSize = if (isSmallScreen) 10.sp else 12.sp
-                        )
+                        Text(stringResource(R.string.main_resume), fontSize = dimens.btnFontSize)
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     TextButton(
                         onClick = { onBoardClick(config) },
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(0.dp)
+                        modifier = modifierMaxWidth,
+                        contentPadding = zeroPadding
                     ) {
-                        Text(
-                            stringResource(R.string.main_new_game),
-                            fontSize = if (isSmallScreen) 10.sp else 12.sp
-                        )
+                        Text(stringResource(R.string.main_new_game), fontSize = dimens.btnFontSize)
                     }
                 } else {
                     Button(
                         onClick = { onBoardClick(config) },
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(0.dp)
+                        modifier = modifierMaxWidth,
+                        contentPadding = zeroPadding
                     ) {
-                        Text(
-                            stringResource(R.string.main_play),
-                            fontSize = if (isSmallScreen) 10.sp else 12.sp
-                        )
+                        Text(stringResource(R.string.main_play), fontSize = dimens.btnFontSize)
                     }
                 }
             }
@@ -338,40 +347,23 @@ class MainScreen : Screen {
                     modifier = Modifier.padding(vertical = 4.dp)
                 ) {
                     GameMode.entries.forEach { mode ->
-                        ModeItem(
-                            mode = mode,
-                            onClick = {
-                                onModeSelected(mode)
-                                onDismiss()
-                            }
-                        )
+                        ModeItem(mode = mode, onClick = { onModeSelected(mode); onDismiss() })
                     }
                 }
             },
             confirmButton = {},
             dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.common_close))
-                }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_close)) }
             }
         )
     }
 
     @Composable
-    private fun ModeItem(
-        mode: GameMode,
-        onClick: () -> Unit
-    ) {
-        val undoText = when (mode.undoPolicy) {
-            UndoPolicy.UNLIMITED -> stringResource(R.string.undo_unlimited)
-            UndoPolicy.SINGLE -> stringResource(R.string.undo_single)
-            UndoPolicy.NONE -> stringResource(R.string.undo_none)
-        }
-
-        val modeLabel = when (mode) {
-            GameMode.CASUAL -> stringResource(R.string.mode_casual)
-            GameMode.CLASSIC -> stringResource(R.string.mode_classic)
-            GameMode.HARDCORE -> stringResource(R.string.mode_hardcore)
+    private fun ModeItem(mode: GameMode, onClick: () -> Unit) {
+        val (undoText, modeLabel) = when (mode) {
+            GameMode.CASUAL -> stringResource(R.string.undo_unlimited) to stringResource(R.string.mode_casual)
+            GameMode.CLASSIC -> stringResource(R.string.undo_single) to stringResource(R.string.mode_classic)
+            GameMode.HARDCORE -> stringResource(R.string.undo_none) to stringResource(R.string.mode_hardcore)
         }
 
         val containerColor = if (mode.undoPolicy == UndoPolicy.NONE) {

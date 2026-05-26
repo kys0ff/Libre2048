@@ -6,7 +6,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -15,11 +17,13 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,20 +32,26 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -78,9 +88,9 @@ fun ScoreCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            if (icon != null) {
+            icon?.let {
                 Icon(
-                    painter = icon,
+                    painter = it,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
@@ -150,10 +160,8 @@ fun GameBoard(
                 )
             }
     ) {
-        val tileW = (maxWidth - (gap * (cols - 1))) / cols
-        val tileH = (maxHeight - (gap * (rows - 1))) / rows
-        val tileSize = minOf(tileW, tileH)
-
+        val tileSize =
+            minOf((maxWidth - (gap * (cols - 1))) / cols, (maxHeight - (gap * (rows - 1))) / rows)
         val boardWidth = (tileSize * cols) + (gap * (cols - 1))
         val boardHeight = (tileSize * rows) + (gap * (rows - 1))
 
@@ -180,7 +188,7 @@ fun GameBoard(
             }
 
             grid.flatten().filterNotNull().forEach { tile ->
-                key(tile.id) {
+                androidx.compose.runtime.key(tile.id) {
                     AnimatedTileItem(tile = tile, tileSize = tileSize, gap = gap)
                 }
             }
@@ -192,18 +200,32 @@ fun GameBoard(
 fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
     val xOffset by animateDpAsState(
         targetValue = (tileSize + gap) * tile.x,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 300f),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "xOffset"
     )
     val yOffset by animateDpAsState(
         targetValue = (tileSize + gap) * tile.y,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 300f),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "yOffset"
     )
 
-    val (targetBg, targetText) = getTileColors(tile.value)
-    val animatedBg by animateColorAsState(targetValue = targetBg, label = "bgColor")
-    val animatedText by animateColorAsState(targetValue = targetText, label = "textColor")
+    val (targetBg, targetText) = getTileColors(tile.value, MaterialTheme.colorScheme)
+    val animatedBg by animateColorAsState(
+        targetValue = targetBg,
+        animationSpec = tween(durationMillis = 150),
+        label = "bgColor"
+    )
+    val animatedText by animateColorAsState(
+        targetValue = targetText,
+        animationSpec = tween(durationMillis = 150),
+        label = "textColor"
+    )
 
     val fontSize = when {
         tile.value < 100 -> 30.sp
@@ -212,18 +234,35 @@ fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
         else -> 16.sp
     }
 
-    val scale = remember { Animatable(0f) }
+    val scale = remember { Animatable(1f) }
+    val lastValue = remember { mutableIntStateOf(tile.value) }
 
-    LaunchedEffect(tile.id) {
-        if (scale.value == 0f) {
-            scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
-        }
-    }
-
-    LaunchedEffect(tile.value) {
-        if (scale.value >= 0.9f) {
-            scale.animateTo(1.15f, spring(stiffness = Spring.StiffnessHigh))
-            scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+    LaunchedEffect(tile.id, tile.value) {
+        if (scale.value == 1f && tile.value == lastValue.intValue) {
+            scale.snapTo(0f)
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+        } else if (tile.value != lastValue.intValue) {
+            lastValue.intValue = tile.value
+            scale.animateTo(
+                targetValue = 1.2f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessHigh
+                )
+            )
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
         }
     }
 
@@ -258,45 +297,66 @@ fun GameBoardPreview(
     modifier: Modifier = Modifier,
     gameState: GameState? = null
 ) {
-    BoxWithConstraints(
-        modifier = modifier
-            .aspectRatio(cols.toFloat() / rows.toFloat())
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-            .padding(4.dp)
-    ) {
-        val gap = 2.dp
-        val tileSize = (maxWidth - (gap * (cols - 1))) / cols
+    val theme = MaterialTheme.colorScheme
+    val textMeasurer = rememberTextMeasurer()
+    val containerBgColor = theme.surfaceVariant.copy(alpha = 0.3f)
 
-        Column(verticalArrangement = Arrangement.spacedBy(gap)) {
-            repeat(rows) { r ->
-                Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
-                    repeat(cols) { c ->
-                        val tile = gameState?.grid?.getOrNull(r)?.getOrNull(c)
-                        val (backgroundColor, textColor) = getTileColors(tile?.value)
-                        
-                        Box(
-                            modifier = Modifier
-                                .size(tileSize)
-                                .background(
-                                    if (tile == null) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-                                    else backgroundColor,
-                                    RoundedCornerShape(2.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (tile != null) {
-                                Text(
-                                    text = tile.value.toString(),
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = (tileSize.value * 0.4f).sp,
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    color = textColor,
-                                    maxLines = 1
-                                )
-                            }
-                        }
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(containerBgColor)
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val gapPx = 2.dp.toPx()
+            val paddingPx = 4.dp.toPx()
+
+            val availableWidth = size.width - (paddingPx * 2)
+            val availableHeight = size.height - (paddingPx * 2)
+
+            val tileSize = minOf(
+                (availableWidth - (gapPx * (cols - 1))) / cols,
+                (availableHeight - (gapPx * (rows - 1))) / rows
+            )
+
+            val startX =
+                paddingPx + (availableWidth - ((tileSize * cols) + (gapPx * (cols - 1)))) / 2f
+            val startY =
+                paddingPx + (availableHeight - ((tileSize * rows) + (gapPx * (rows - 1)))) / 2f
+            val cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
+
+            for (r in 0 until rows) {
+                for (c in 0 until cols) {
+                    val tile = gameState?.grid?.getOrNull(r)?.getOrNull(c)
+                    val (tileBg, tileTextColor) = getTileColors(tile?.value, theme)
+
+                    val xOffset = startX + c * (tileSize + gapPx)
+                    val yOffset = startY + r * (tileSize + gapPx)
+
+                    drawRoundRect(
+                        color = tileBg,
+                        topLeft = Offset(xOffset, yOffset),
+                        size = Size(tileSize, tileSize),
+                        cornerRadius = cornerRadius
+                    )
+
+                    if (tile != null) {
+                        val textString = tile.value.toString()
+                        val textStyle = TextStyle(
+                            color = tileTextColor,
+                            fontSize = (tileSize * 0.4f).toSp(),
+                            fontWeight = FontWeight.Bold
+                        )
+                        val textLayoutResult = textMeasurer.measure(textString, textStyle)
+
+                        drawText(
+                            textMeasurer = textMeasurer,
+                            text = textString,
+                            style = textStyle,
+                            topLeft = Offset(
+                                xOffset + (tileSize - textLayoutResult.size.width) / 2f,
+                                yOffset + (tileSize - textLayoutResult.size.height) / 2f
+                            )
+                        )
                     }
                 }
             }
@@ -304,22 +364,18 @@ fun GameBoardPreview(
     }
 }
 
-@Composable
-private fun getTileColors(value: Int?): Pair<Color, Color> {
-    val theme = MaterialTheme.colorScheme
-    return when (value) {
-        null -> theme.surfaceVariant.copy(alpha = 0.3f) to Color.Transparent
-        2 -> theme.primaryContainer to theme.onPrimaryContainer
-        4 -> theme.secondaryContainer to theme.onSecondaryContainer
-        8 -> theme.tertiaryContainer to theme.onTertiaryContainer
-        16 -> theme.primary to theme.onPrimary
-        32 -> theme.secondary to theme.onSecondary
-        64 -> theme.tertiary to theme.onTertiary
-        128 -> theme.errorContainer to theme.onErrorContainer
-        256 -> theme.inversePrimary to theme.primary
-        512 -> theme.outlineVariant to theme.outline
-        1024 -> theme.scrim to theme.inverseOnSurface
-        2048 -> theme.error to theme.onError
-        else -> theme.onSurface to theme.surface
-    }
+private fun getTileColors(value: Int?, theme: ColorScheme): Pair<Color, Color> = when (value) {
+    null -> theme.onSurface.copy(alpha = 0.1f) to Color.Transparent
+    2 -> theme.primaryContainer to theme.onPrimaryContainer
+    4 -> theme.secondaryContainer to theme.onSecondaryContainer
+    8 -> theme.tertiaryContainer to theme.onTertiaryContainer
+    16 -> theme.primary to theme.onPrimary
+    32 -> theme.secondary to theme.onSecondary
+    64 -> theme.tertiary to theme.onTertiary
+    128 -> theme.errorContainer to theme.onErrorContainer
+    256 -> theme.inversePrimary to theme.primary
+    512 -> theme.outlineVariant to theme.outline
+    1024 -> theme.scrim to theme.inverseOnSurface
+    2048 -> theme.error to theme.onError
+    else -> theme.onSurface to theme.surface
 }
