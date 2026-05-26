@@ -46,4 +46,14 @@
     <string name="mode_casual">休闲</string>
     <string name="mode_classic">经典</string>
     <string name="mode_hardcore">硬核</string>
+
+    <!-- About Screen -->
+    <string name="about_title">关于</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_developer">开发者</string>
+    <string name="about_source_code">源代码</string>
+    <string name="about_source_code_desc">在 GitHub 上查看</string>
+    <string name="about_license">许可证</string>
+    <string name="about_libraries">开源库</string>
+    <string name="about_libraries_desc">本项目中使用的库</string>
 </resources>

@@ -46,4 +46,14 @@
     <string name="mode_casual">Entspannt</string>
     <string name="mode_classic">Klassisch</string>
     <string name="mode_hardcore">Hardcore</string>
+
+    <!-- About Screen -->
+    <string name="about_title">Über</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_developer">Entwickler</string>
+    <string name="about_source_code">Quellcode</string>
+    <string name="about_source_code_desc">Auf GitHub ansehen</string>
+    <string name="about_license">Lizenz</string>
+    <string name="about_libraries">Open-Source-Bibliotheken</string>
+    <string name="about_libraries_desc">In diesem Projekt verwendete Bibliotheken</string>
 </resources>

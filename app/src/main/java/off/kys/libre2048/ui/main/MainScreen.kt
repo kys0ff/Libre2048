@@ -54,6 +54,7 @@ import off.kys.libre2048.di.appModule
 import off.kys.libre2048.domain.model.BoardConfig
 import off.kys.libre2048.domain.model.GameMode
 import off.kys.libre2048.domain.model.UndoPolicy
+import off.kys.libre2048.ui.about.AboutScreen
 import off.kys.libre2048.ui.common.GameBoardPreview
 import off.kys.libre2048.ui.game.Game2048Screen
 import off.kys.libre2048.ui.stats.StatisticsScreen
@@ -66,19 +67,21 @@ import org.koin.dsl.koinConfiguration
 class MainScreen : Screen {
 
     companion object {
-        private val SQUARE_MODES = listOf(
-            BoardConfig(4, 4),
-            BoardConfig(5, 5),
-            BoardConfig(6, 6),
-            BoardConfig(8, 8)
-        )
+        private val SQUARE_MODES: List<BoardConfig>
+            get() = listOf(
+                BoardConfig(4, 4),
+                BoardConfig(5, 5),
+                BoardConfig(6, 6),
+                BoardConfig(8, 8)
+            )
 
-        private val RECT_MODES = listOf(
-            BoardConfig(3, 5),
-            BoardConfig(4, 6),
-            BoardConfig(5, 8),
-            BoardConfig(6, 9)
-        )
+        private val RECT_MODES: List<BoardConfig>
+            get() = listOf(
+                BoardConfig(3, 5),
+                BoardConfig(4, 6),
+                BoardConfig(5, 8),
+                BoardConfig(6, 9)
+            )
     }
 
     @Composable
@@ -106,6 +109,30 @@ class MainScreen : Screen {
             val isSmallScreen = maxWidth < 360.dp || maxHeight < 600.dp
 
             Scaffold(
+                topBar = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = if (isSmallScreen) 4.dp else 12.dp)
+                            .padding(top = if (isSmallScreen) 4.dp else 12.dp)
+                    ) {
+                        Surface(
+                            onClick = { navigator += AboutScreen() },
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.round_sentiment_satisfied_alt_24), // Using a smiley as a placeholder for info/about
+                                contentDescription = stringResource(R.string.about_title),
+                                modifier = Modifier
+                                    .padding(if (isSmallScreen) 8.dp else 12.dp)
+                                    .size(if (isSmallScreen) 20.dp else 24.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                },
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = { navigator += StatisticsScreen() },

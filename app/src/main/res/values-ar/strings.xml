@@ -46,4 +46,14 @@
     <string name="mode_casual">كاجوال</string>
     <string name="mode_classic">كلاسيكي</string>
     <string name="mode_hardcore">هاردكور</string>
+
+    <!-- About Screen -->
+    <string name="about_title">حول</string>
+    <string name="about_version">الإصدار %1$s</string>
+    <string name="about_developer">المطور</string>
+    <string name="about_source_code">كود المصدر</string>
+    <string name="about_source_code_desc">عرض على GitHub</string>
+    <string name="about_license">الترخيص</string>
+    <string name="about_libraries">المكتبات مفتوحة المصدر</string>
+    <string name="about_libraries_desc">المكتبات المستخدمة في هذا المشروع</string>
 </resources>
