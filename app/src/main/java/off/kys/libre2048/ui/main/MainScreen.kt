@@ -103,7 +103,7 @@ class MainScreen : Screen {
                 topPadding = if (isSmall) 4.dp else 12.dp,
                 infoIconPadding = if (isSmall) 8.dp else 12.dp,
                 infoIconSize = if (isSmall) 20.dp else 24.dp,
-                fabPadding = if (isSmall) 4.dp else 16.dp,
+                fabPadding = if (isSmall) 4.dp else 8.dp,
                 titleTopSpacer = if (isSmall) 20.dp else 48.dp,
                 titleFontSize = if (isSmall) 48.sp else 80.sp,
                 titleLineHeight = if (isSmall) 52.sp else 86.sp,
