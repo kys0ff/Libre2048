@@ -3,6 +3,7 @@ package off.kys.libre2048.ui.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -36,9 +37,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -47,13 +50,18 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.libre2048.R
 import off.kys.libre2048.data.repository.GameRepository
+import off.kys.libre2048.di.appModule
 import off.kys.libre2048.domain.model.BoardConfig
 import off.kys.libre2048.domain.model.GameMode
 import off.kys.libre2048.domain.model.UndoPolicy
 import off.kys.libre2048.ui.common.GameBoardPreview
 import off.kys.libre2048.ui.game.Game2048Screen
 import off.kys.libre2048.ui.stats.StatisticsScreen
+import off.kys.libre2048.ui.theme.Libre2048Theme
+import org.koin.android.ext.koin.androidContext
+import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
+import org.koin.dsl.koinConfiguration
 
 class MainScreen : Screen {
 
@@ -94,58 +102,76 @@ class MainScreen : Screen {
             )
         }
 
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigator += StatisticsScreen() }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.round_bar_chart_24),
-                        contentDescription = stringResource(R.string.common_stats)
-                    )
+        BoxWithConstraints {
+            // Nexus One profile fallback detection
+            val isSmallScreen = maxWidth < 360.dp || maxHeight < 600.dp
+
+            Scaffold(
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { navigator += StatisticsScreen() },
+                        modifier = Modifier.padding(if (isSmallScreen) 4.dp else 16.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.round_bar_chart_24),
+                            contentDescription = stringResource(R.string.common_stats)
+                        )
+                    }
                 }
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                Spacer(modifier = Modifier.height(48.dp))
-                Text(
-                    text = stringResource(R.string.game_title),
-                    style = MaterialTheme.typography.displayLarge,
-                    fontWeight = FontWeight.Black,
-                    fontSize = 80.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Text(
-                    text = stringResource(R.string.main_square_modes),
-                    style = MaterialTheme.typography.headlineSmall,
+            ) { innerPadding ->
+                Column(
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .align(Alignment.Start)
-                )
-                ModeRow(SQUARE_MODES, repository, navigator) { selectedBoardConfig.value = it }
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Spacer(modifier = Modifier.height(if (isSmallScreen) 20.dp else 48.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = stringResource(R.string.game_title),
+                        style = MaterialTheme.typography.displayLarge,
+                        fontWeight = FontWeight.Black,
+                        fontSize = if (isSmallScreen) 48.sp else 80.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        lineHeight = if (isSmallScreen) 52.sp else 86.sp
+                    )
 
-                Text(
-                    text = stringResource(R.string.main_rectangular_modes),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .align(Alignment.Start)
-                )
-                ModeRow(RECT_MODES, repository, navigator) { selectedBoardConfig.value = it }
+                    Spacer(modifier = Modifier.height(if (isSmallScreen) 16.dp else 32.dp))
 
-                Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = stringResource(R.string.main_square_modes),
+                        style = if (isSmallScreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
+                            .align(Alignment.Start)
+                    )
+                    ModeRow(
+                        SQUARE_MODES,
+                        repository,
+                        navigator,
+                        isSmallScreen
+                    ) { selectedBoardConfig.value = it }
+
+                    Spacer(modifier = Modifier.height(if (isSmallScreen) 12.dp else 24.dp))
+
+                    Text(
+                        text = stringResource(R.string.main_rectangular_modes),
+                        style = if (isSmallScreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
+                            .align(Alignment.Start)
+                    )
+                    ModeRow(
+                        RECT_MODES,
+                        repository,
+                        navigator,
+                        isSmallScreen
+                    ) { selectedBoardConfig.value = it }
+
+                    Spacer(modifier = Modifier.height(if (isSmallScreen) 16.dp else 32.dp))
+                }
             }
         }
     }
@@ -155,17 +181,22 @@ class MainScreen : Screen {
         modes: List<BoardConfig>,
         repository: GameRepository,
         navigator: Navigator,
+        isSmallScreen: Boolean,
         onBoardClick: (BoardConfig) -> Unit
     ) {
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(
+                horizontal = if (isSmallScreen) 12.dp else 16.dp,
+                vertical = 8.dp
+            ),
+            horizontalArrangement = Arrangement.spacedBy(if (isSmallScreen) 8.dp else 12.dp)
         ) {
             items(modes) { mode ->
                 ModeCard(
                     config = mode,
                     repository = repository,
                     navigator = navigator,
+                    isSmallScreen = isSmallScreen,
                     onBoardClick = onBoardClick
                 )
             }
@@ -177,13 +208,17 @@ class MainScreen : Screen {
         config: BoardConfig,
         repository: GameRepository,
         navigator: Navigator,
+        isSmallScreen: Boolean,
         onBoardClick: (BoardConfig) -> Unit
     ) {
         val savedState by repository.getCurrentState(config.rows, config.cols)
             .collectAsState(initial = null)
 
+        val cardWidth = if (isSmallScreen) 115.dp else 140.dp
+        val previewSize = if (isSmallScreen) 75.dp else 100.dp
+
         Card(
-            modifier = Modifier.width(140.dp),
+            modifier = Modifier.width(cardWidth),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
                     alpha = 0.5f
@@ -191,20 +226,21 @@ class MainScreen : Screen {
             )
         ) {
             Column(
-                modifier = Modifier.padding(12.dp),
+                modifier = Modifier.padding(if (isSmallScreen) 8.dp else 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 GameBoardPreview(
                     rows = config.rows,
                     cols = config.cols,
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(previewSize)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = stringResource(R.string.stats_grid_format, config.rows, config.cols),
+                    style = if (isSmallScreen) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 if (savedState != null) {
                     Button(
@@ -218,15 +254,21 @@ class MainScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text(stringResource(R.string.main_resume), fontSize = 12.sp)
+                        Text(
+                            stringResource(R.string.main_resume),
+                            fontSize = if (isSmallScreen) 10.sp else 12.sp
+                        )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     TextButton(
                         onClick = { onBoardClick(config) },
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text(stringResource(R.string.main_new_game), fontSize = 12.sp)
+                        Text(
+                            stringResource(R.string.main_new_game),
+                            fontSize = if (isSmallScreen) 10.sp else 12.sp
+                        )
                     }
                 } else {
                     Button(
@@ -234,7 +276,10 @@ class MainScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text(stringResource(R.string.main_play), fontSize = 12.sp)
+                        Text(
+                            stringResource(R.string.main_play),
+                            fontSize = if (isSmallScreen) 10.sp else 12.sp
+                        )
                     }
                 }
             }
@@ -262,8 +307,8 @@ class MainScreen : Screen {
             },
             text = {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(vertical = 4.dp)
                 ) {
                     GameMode.entries.forEach { mode ->
                         ModeItem(
@@ -316,14 +361,14 @@ class MainScreen : Screen {
         ) {
             Row(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(12.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(36.dp)
                         .background(
                             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
                             shape = CircleShape
@@ -338,7 +383,8 @@ class MainScreen : Screen {
                     Icon(
                         painter = painterResource(icon),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 
@@ -358,10 +404,28 @@ class MainScreen : Screen {
                 Icon(
                     painter = painterResource(R.drawable.round_chevron_right_24),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
             }
         }
     }
+}
+
+@Preview(device = "id:pixel_tablet")
+@Composable
+private fun MainScreenPreview() {
+    val context = LocalContext.current
+    KoinApplication(
+        configuration = koinConfiguration(
+            declaration = {
+                androidContext(context)
+                modules(appModule)
+            }
+        ), content = {
+            Libre2048Theme {
+                Navigator(MainScreen())
+            }
+        }
+    )
 }
