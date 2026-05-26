@@ -103,7 +103,6 @@ class MainScreen : Screen {
         }
 
         BoxWithConstraints {
-            // Nexus One profile fallback detection
             val isSmallScreen = maxWidth < 360.dp || maxHeight < 600.dp
 
             Scaffold(
@@ -232,7 +231,8 @@ class MainScreen : Screen {
                 GameBoardPreview(
                     rows = config.rows,
                     cols = config.cols,
-                    modifier = Modifier.size(previewSize)
+                    modifier = Modifier.size(previewSize),
+                    gameState = savedState
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
@@ -422,7 +422,8 @@ private fun MainScreenPreview() {
                 androidContext(context)
                 modules(appModule)
             }
-        ), content = {
+        ),
+        content = {
             Libre2048Theme {
                 Navigator(MainScreen())
             }

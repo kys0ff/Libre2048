@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import off.kys.libre2048.domain.model.Direction
+import off.kys.libre2048.domain.model.GameState
 import off.kys.libre2048.domain.model.Tile
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -254,7 +255,8 @@ fun AnimatedTileItem(tile: Tile, tileSize: Dp, gap: Dp) {
 fun GameBoardPreview(
     rows: Int,
     cols: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    gameState: GameState? = null
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -267,17 +269,34 @@ fun GameBoardPreview(
         val tileSize = (maxWidth - (gap * (cols - 1))) / cols
 
         Column(verticalArrangement = Arrangement.spacedBy(gap)) {
-            repeat(rows) {
+            repeat(rows) { r ->
                 Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
-                    repeat(cols) {
+                    repeat(cols) { c ->
+                        val tile = gameState?.grid?.getOrNull(r)?.getOrNull(c)
+                        val (backgroundColor, textColor) = getTileColors(tile?.value)
+                        
                         Box(
                             modifier = Modifier
                                 .size(tileSize)
                                 .background(
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                                    if (tile == null) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                                    else backgroundColor,
                                     RoundedCornerShape(2.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (tile != null) {
+                                Text(
+                                    text = tile.value.toString(),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = (tileSize.value * 0.4f).sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = textColor,
+                                    maxLines = 1
                                 )
-                        )
+                            }
+                        }
                     }
                 }
             }
