@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 import off.kys.libre2048.ui.main.MainScreen
 import off.kys.libre2048.ui.theme.Libre2048Theme
 
@@ -16,7 +17,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Libre2048Theme {
-                Navigator(MainScreen())
+                Navigator(MainScreen()) {
+                    SlideTransition(it)
+                }
             }
         }
     }
