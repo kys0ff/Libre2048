@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.libre2048.R
 import off.kys.libre2048.domain.model.GameMode
 import off.kys.libre2048.domain.model.GameScore
@@ -56,7 +55,7 @@ class StatisticsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalNavigator.current
         val viewModel = koinViewModel<StatisticsViewModel>()
         val uiState by viewModel.uiState.collectAsState()
 
@@ -73,7 +72,7 @@ class StatisticsScreen : Screen {
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
+                        IconButton(onClick = { navigator?.pop() }) {
                             Icon(
                                 painter = painterResource(R.drawable.round_arrow_back_24),
                                 contentDescription = stringResource(R.string.common_back)
